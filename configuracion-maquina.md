@@ -69,7 +69,7 @@ Instalacion DB
 sudo mysql -u root
 
 CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-CREATE USER 'wp_user'@'localhost' IDENTIFIED BY 'amoníaco!(NH3)';
+CREATE USER 'wp_user'@'localhost' IDENTIFIED BY '9/12/!1868_Br3sl$a5ia!';
 GRANT ALL PRIVILEGES ON wordpress.* TO 'wp_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
