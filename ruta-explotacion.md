@@ -1,3 +1,4 @@
+wpscan --url http://192.168.1.103:7664 -e vp --plugins-detection aggressive
 
 MAIL-MASTA vulnerabildiad
 
