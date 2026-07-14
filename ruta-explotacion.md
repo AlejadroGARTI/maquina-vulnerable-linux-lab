@@ -1,5 +1,5 @@
 wpscan --url http://192.168.1.103:7664 -e ap --plugins-detection aggressive
-
+```bash
 _______________________________________________________________
          __          _______   _____
          \ \        / /  __ \ / ____|
@@ -114,6 +114,7 @@ Interesting Finding(s):
 [+] Memory used: 458.059 MB
 [+] Elapsed time: 00:02:55
 
+```
 
 MAIL-MASTA vulnerabildiad
 
