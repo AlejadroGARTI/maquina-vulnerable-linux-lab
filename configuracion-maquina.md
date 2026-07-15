@@ -189,8 +189,6 @@ SHELL=/bin/sh
 * *     * * *   clara_immerwahr /opt/scripts/backup_notes.sh
 ```
 
-SUDO 
-
 ## Configuración de Sudoers para Clara
 
 Adición de un privilegio en el archivo /etc/sudoers que permite a la usuaria clara_immerwahr ejecutar el comando /usr/bin/awk con permisos de superusuario sin necesidad de proporcionar contraseña, creando así un vector de escalada de privilegios mediante la explotación de la funcionalidad de ejecución de comandos de awk.
