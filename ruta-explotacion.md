@@ -332,7 +332,7 @@ whoami
 root
 ```
 
-
+```bash
 [ Atacante (Kali) ]
        │
        ▼ (LFI en WordPress)
@@ -343,3 +343,4 @@ root
        │
        ▼ (Escalada de Privilegios: GTFOBins vía sudo o SUID)
 [ ROOT ]
+```
