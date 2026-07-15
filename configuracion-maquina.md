@@ -110,6 +110,8 @@ sudo cp -r wordpress/* /var/www/html/
 # Ajustar los permisos para que Lighttpd 
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/
+
+# Contraseña: crU^A5rRlwI3NdP7ff
 ```
 ![](Evidencias_Visuales/wordpressconfig)
 ![](Evidencias_Visuales/wordpresscredentials)
@@ -128,15 +130,13 @@ sudo chown -R www-data:www-data /var/www/html/wp-content/plugins/mail-masta
 ```
 ![](Evidencias_Visuales/mailmasta)
 
-
-http://192.168.184.140:7664/
-
-
-crU^A5rRlwI3NdP7ff
+---
+---
 
 
 
-Configuración segundo usuario 
+
+## Creación de Segundo Usuario
 
 
 
