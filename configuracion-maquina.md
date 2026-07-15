@@ -133,31 +133,35 @@ sudo chown -R www-data:www-data /var/www/html/wp-content/plugins/mail-masta
 ---
 ---
 
-
-
-
 ## Creación de Segundo Usuario
 
+Creación del usuario clara_immerwahr con contraseña pacifista1915chemsitry!, estableciendo una segunda cuenta en el sistema para ampliar la superficie de ataque y permitir vectores de movimiento lateral.
 
-
+```bash
 sudo adduser clara_immerwahr
 pacifista1915chemsitry!
+```
 
-
-
+## Creación de Script de Backup
+```bash
 sudo mkdir -p /opt/scripts
 sudo nano /opt/scripts/backup_notes.sh
+```
 
-
-
+## Configuración de Script de Backup y Tarea Programada
+```bash
 #!/bin/bash
 # Backup de las notas científicas de Clara
 tar -czf /home/clara_immerwahr/notes_backup.tar.gz /home/clara_immerwahr/documents/ 2>/dev/null
 
-
 sudo chmod 777 /opt/scripts/backup_notes.sh
 sudo nano /etc/crontab
+```
+## Programación de Tarea Cron
 
+onfiguración de una tarea programada en el sistema que ejecutará el script /opt/scripts/backup_notes.sh cada minuto con los privilegios de la usuaria clara_immerwahr, introduciendo así una vulnerabilidad de escalada de privilegios al permitir la ejecución periódica de un script con permisos 777 que puede ser modificado por cualquier usuario del sistema.
+
+```bash
   GNU nano 6.2                                                                                       /etc/crontab
 # /etc/crontab: system-wide crontab
 # Unlike any other crontab you don't have to run the `crontab'
@@ -183,15 +187,21 @@ SHELL=/bin/sh
 52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
 #
 * *     * * *   clara_immerwahr /opt/scripts/backup_notes.sh
+```
 
 SUDO 
 
+## Configuración de Sudoers para Clara
 
+Adición de un privilegio en el archivo /etc/sudoers que permite a la usuaria clara_immerwahr ejecutar el comando /usr/bin/awk con permisos de superusuario sin necesidad de proporcionar contraseña, creando así un vector de escalada de privilegios mediante la explotación de la funcionalidad de ejecución de comandos de awk.
+
+```bash
 sudo visudo
 
 @includedir /etc/sudoers.d
 
 clara_immerwahr ALL=(ALL) NOPASSWD: /usr/bin/awk
+```
 
 
 
