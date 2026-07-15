@@ -111,6 +111,9 @@ sudo cp -r wordpress/* /var/www/html/
 sudo chown -R www-data:www-data /var/www/html/
 sudo chmod -R 755 /var/www/html/
 ```
+![](Evidencias_Visuales/wordpressconfig)
+![](Evidencias_Visuales/wordpresscredentials)
+
 Instalación del plugin MailMasta 1.0
 ```bash
 cd /var/www/html/wp-content/plugins/
@@ -123,6 +126,8 @@ sudo rm mail-masta.zip
 
 sudo chown -R www-data:www-data /var/www/html/wp-content/plugins/mail-masta
 ```
+![](Evidencias_Visuales/mailmasta)
+
 
 http://192.168.184.140:7664/
 
