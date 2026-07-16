@@ -309,6 +309,7 @@ Conexión al sistema a través de SSH utilizando las credenciales del usuario ha
 ---
 
 ### FLAG #1: Fritz Haber
+
 Reconocimiento de los directorios: 
 ```bash
 haber_fritz@ammonia:~$ ls -la
@@ -371,6 +372,7 @@ Archive:  Proceso Haber-Bosch para la producción de amoníaco.zip
       299                     6 files
 ```
 Volvemos a la página web y al inspeccionar la página observamos una fórmula extraña. 
+
 ![](Evidencias_Visuales/inspeccionbosch)
 
 en donde la pista se encuentra en la sección "No usar para la reacción"
