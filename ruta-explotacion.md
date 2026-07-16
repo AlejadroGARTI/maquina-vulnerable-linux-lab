@@ -460,6 +460,24 @@ clara_immerwahr@ammonia:~$
 
 ### FLAG #2: Clara Immerwahr
 
+Inspeccionamos de manera compelta todos los archivos del directorio
+
+```bash
+clara_immerwahr@ammonia:~$ ls -la
+total 52
+drwxr-x--- 5 clara_immerwahr clara_immerwahr  4096 Jul 16 10:46 .
+drwxr-xr-x 4 root            root             4096 Jul 14 14:22 ..
+-rw------- 1 clara_immerwahr clara_immerwahr 10028 Jul 16 10:53 .bash_history
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr   220 Jul 14 14:22 .bash_logout
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr  3771 Jul 14 14:22 .bashrc
+drwx------ 2 clara_immerwahr clara_immerwahr  4096 Jul 16 10:46 .cache
+drwxr-xr-x 3 clara_immerwahr clara_immerwahr  4096 Jul 16 11:16 documents
+drwx------ 3 clara_immerwahr clara_immerwahr  4096 Jul 15 10:49 .local
+-rw-rw-r-- 1 clara_immerwahr clara_immerwahr  2130 Jul 16 11:53 notes_backup.tar.gz
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr   807 Jul 14 14:22 .profile
+-rw-rw-r-- 1 clara_immerwahr clara_immerwahr    16 Jul 14 15:00 sudo
+```
+
 Encontramos diferentes archivos con información valiosa.
 ```bash
 clara_immerwahr@ammonia:~/documents$ ls -la
@@ -561,6 +579,36 @@ python3 -c "cifrado='DNCEYGN}AMLMAKOKGLVM}AKGLVKDKAM}FG@G}RPGQGPTCP}NC}TKFC}[}LM
 ---
 
 ## Escalada a Root mediante Sudoers con Awk usando GFTOBins
+
+Si hemos sido cuirosos, en el archivo `carta_1915.txt` tenemos que la carta de Clara contiene varias pistas clave sobre la escalada de privilegios. La frase "en el principio, todo comienza con un comando" sugiere que debe ejecutar un comando específico, mientras que "la herramienta que procesa texto" apunta directamente a awk, una utilidad de Linux para procesar archivos de texto. La mención de "Usa su función BEGIN" es la pista más reveladora, ya que BEGIN es un bloque especial en awk que se ejecuta antes de procesar cualquier entrada, permitiendo ejecutar código arbitrario. Finalmente, "invocar lo que necesitas" indica que debe usar la función system() dentro de ese bloque para ejecutar comandos del sistema, como /bin/sh, y así obtener una shell con privilegios elevados. 
+
+```bash
+clara_immerwahr@ammonia:~/documents/conflicto_etico$ cat carta_1915.txt
+2 de mayo de 1915
+
+Querido Hermann,
+
+Cuando leas esto, ya no estaré. No he podido seguir viendo cómo la ciencia
+que tanto amamos se convierte en un instrumento de muerte.
+
+Tu padre ha elegido su camino. Yo he elegido el mío.
+
+La verdadera ciencia debe servir a la vida, no destruirla.
+
+Con todo mi amor,
+Clara
+
+P.D. He escondido la verdad en lo más profundo del sistema.
+
+Recuerda: en el principio, todo comienza con un comando.
+La herramienta que procesa texto tiene un poder oculto.
+Usa su función BEGIN para invocar lo que necesitas.
+
+El camino hacia la verdad está en /root.
+Pero primero, debes aprender a usar las herramientas como un administrador.
+
+"Nunca aceptes una respuesta sin demostrarla."
+```
 
 Ejecución del comando sudo awk 'BEGIN {system("/bin/sh")}' gracias al privilegio NOPASSWD configurado para clara_immerwahr sobre /usr/bin/awk en el archivo sudoers. Esto permite a la usuaria ejecutar awk como root, y al usar la función system() dentro de un bloque BEGIN, se obtiene una shell interactiva con privilegios de superusuario, logrando así la escalada completa a root.
 
