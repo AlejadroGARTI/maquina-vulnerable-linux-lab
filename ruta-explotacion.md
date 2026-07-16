@@ -303,7 +303,9 @@ require_once ABSPATH . 'wp-settings.php';
 ```
 ## Acceso SSH con Credenciales Reutilizadas
 
-Conexión al sistema a través de SSH utilizando las credenciales del usuario haber_fritz, ya que la contraseña obtenida de wp-config.php coincide con la del usuario del sistema. Esto permite obtener acceso inicial a la máquina vulnerable mediante el puerto 22, aprovechando la mala práctica de reutilizar contraseñas entre la base de datos WordPress y el usuario del sistema operativo.
+Conexión al sistema a través de SSH utilizando las credenciales del usuario haber_fritz, ya que la contraseña obtenida de wp-config.php coincide con la del usuario del sistema, esto lo sabemos gracias a la pista de la página web de Haber Fritz. Esto permite obtener acceso inicial a la máquina vulnerable mediante el puerto 22, aprovechando la mala práctica de reutilizar contraseñas entre la base de datos WordPress y el usuario del sistema operativo.
+
+![](Evidencias_Visuales/pistacredenciales)
 
 ---
 ---
