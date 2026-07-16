@@ -341,7 +341,7 @@ drwxr-x--- 7 haber_fritz haber_fritz 4096 Jul 16 08:05 ..
 drwxrwxr-x 5 haber_fritz haber_fritz 4096 Jul 16 08:11 backup
 -rw-rw-r-- 1 haber_fritz haber_fritz   26 Jul 16 08:05 user_config.txt
 ```
-Encontramos un .zip, en donde la contraseña para abrirlo se encuentra en la página 
+Encontramos un .zip, en donde la contraseña para abrirlo se encuentra en la página, ya que tiene exactamente el mismo nombre que el zip.
 ```bash
 haber_fritz@ammonia:~/.secret/backup$ ls -la
 total 36
