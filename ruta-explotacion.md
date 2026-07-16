@@ -305,9 +305,103 @@ require_once ABSPATH . 'wp-settings.php';
 
 Conexión al sistema a través de SSH utilizando las credenciales del usuario haber_fritz, ya que la contraseña obtenida de wp-config.php coincide con la del usuario del sistema. Esto permite obtener acceso inicial a la máquina vulnerable mediante el puerto 22, aprovechando la mala práctica de reutilizar contraseñas entre la base de datos WordPress y el usuario del sistema operativo.
 
+---
+---
+
+### FLAG #1: Fritz Haber
+Reconocimiento de los directorios: 
+```bash
+haber_fritz@ammonia:~$ ls -la
+total 64
+drwxr-x--- 7 haber_fritz haber_fritz 4096 Jul 16 08:05 .
+drwxr-xr-x 4 root        root        4096 Jul 14 14:22 ..
+-rw-rw-r-- 1 haber_fritz haber_fritz   44 Jul 16 07:57 agricultura_1918.txt
+-rw------- 1 haber_fritz haber_fritz 1417 Jul 15 11:45 .bash_history
+-rw-r--r-- 1 haber_fritz haber_fritz  220 Jan  6  2022 .bash_logout
+-rw-r--r-- 1 haber_fritz haber_fritz 3771 Jan  6  2022 .bashrc
+drwx------ 3 haber_fritz haber_fritz 4096 Jul 16 08:05 .cache
+-rw-rw-r-- 1 haber_fritz haber_fritz   27 Jul 16 08:01 config_server.txt
+drwxrwxr-x 3 haber_fritz haber_fritz 4096 Jul 16 08:01 documentos
+-rw-rw-r-- 1 haber_fritz haber_fritz   17 Jul 16 08:01 lista_compras.txt
+drwx------ 3 haber_fritz haber_fritz 4096 Jul 14 14:46 .local
+-rw------- 1 haber_fritz haber_fritz   13 Jul 14 10:20 .mysql_history
+-rw-rw-r-- 1 haber_fritz haber_fritz   17 Jul 16 08:01 notas_personales.txt
+-rw-r--r-- 1 haber_fritz haber_fritz  807 Jan  6  2022 .profile
+drwxrwxr-x 3 haber_fritz haber_fritz 4096 Jul 16 08:05 .secret
+drwx------ 2 haber_fritz haber_fritz 4096 Jul 14 08:57 .ssh
+-rw-r--r-- 1 haber_fritz haber_fritz    0 Jul 14 09:59 .sudo_as_admin_successful
+```
+```bash
+haber_fritz@ammonia:~$ ls -la .secret/
+total 20
+drwxrwxr-x 3 haber_fritz haber_fritz 4096 Jul 16 08:05 .
+drwxr-x--- 7 haber_fritz haber_fritz 4096 Jul 16 08:05 ..
+-rw-rw-r-- 1 haber_fritz haber_fritz   41 Jul 16 07:57 amoniaco_sintesis.txt
+drwxrwxr-x 5 haber_fritz haber_fritz 4096 Jul 16 08:11 backup
+-rw-rw-r-- 1 haber_fritz haber_fritz   26 Jul 16 08:05 user_config.txt
+```
+Encontramos un .zip, en donde la contraseña para abrirlo se encuentra en la página 
+```bash
+haber_fritz@ammonia:~/.secret/backup$ ls -la
+total 36
+drwxrwxr-x 5 haber_fritz haber_fritz 4096 Jul 16 08:27  .
+drwxrwxr-x 3 haber_fritz haber_fritz 4096 Jul 16 08:05  ..
+-rw-rw-r-- 1 haber_fritz haber_fritz   53 Jul 16 08:10  backup_log.txt
+drwxrwxr-x 2 haber_fritz haber_fritz 4096 Jul 16 08:11  config
+drwxrwxr-x 2 haber_fritz haber_fritz 4096 Jul 16 08:11  data
+-rw-rw-r-- 1 haber_fritz haber_fritz   19 Jul 16 08:10  error_report.log
+drwxrwxr-x 2 haber_fritz haber_fritz 4096 Jul 16 08:11  logs
+-rw-rw-r-- 1 haber_fritz haber_fritz 1445 Jul 16 08:08 'Proceso Haber-Bosch para la producción de amoníaco.zip'
+-rw-rw-r-- 1 haber_fritz haber_fritz   26 Jul 16 08:10  system_config.txt
+```
+Podemos ver el contenido del zip:
+```bash
+unzip -l 'Proceso Haber-Bosch para la producción de amoníaco.zip'
+
+Archive:  Proceso Haber-Bosch para la producción de amoníaco.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+       92  2026-07-16 07:57   proceso_haber_bosch.txt
+       54  2026-07-16 07:57   proceso_haber.txt
+       44  2026-07-16 07:57   agricultura_1918.txt
+       30  2026-07-16 08:08   guerra_quimica.txt
+       41  2026-07-16 07:57   amoniaco_sintesis.txt
+       38  2026-07-16 07:57   nobel_1918.txt
+---------                     -------
+      299                     6 files
+```
+Volvemos a la página web y al inspeccionar la página observamos una fórmula extraña. 
+![](Evidencias_Visuales/inspeccionbosch)
+
+en donde la pista se encuentra en la sección "No usar para la reacción"
+
+![](Evidencias_Visuales/paginahaber)
+
+Aqui vemos que tenemos que el texto Ha sido cifrado mediante ROT8000, ((R))enio, ((O))smio , ((T))antalio , Octaoxígeno ((8)) , Neutronio ((0)) , Neutronio ((0)) , Neutronio ((0)), lo desciframos en cyberchef y nos da la clave para el .zip
+
+𝑁簱𝑔簲簴簼𝐻 簱𝑔簲鶣簻𝑁𝐻簱𝑔簲 罻𝐻粗籆鷩簽簿簵簻 𝑘𝑗簸𝑚𝑜𝑙 = 𝑁(𝑔)+3𝐻 (𝑔)⇌2𝑁𝐻(𝑔) Δ𝐻°=−46,2 𝑘𝑗/𝑚𝑜𝑙
+
+Y descomprimimos el archivo:
+
+```bash
+unzip -p 'Proceso Haber-Bosch para la producción de amoníaco.zip'
+```
+
+En donde la flag se encontraría en proceso_haber_bosch.txt:
+```bash
+fl4gyflag{empieza la primera guerra mundial, enviar de inmediato todo a guerra_quimica.txt}
+```
+
+Y aqui tenemos otra pista para continuar, hay que ver el archivo guerra_quimica.txt en donde nos dice: ver de inmediato /etc/crontab
+
+Por lo que procedemos a la segunda parte de la busqueda:
+
+
+---
+---
 ## Escalada a Clara mediante Cron Mal Configurado
 
-Obtención de acceso al usuario clara_immerwahr explotando la tarea cron que ejecuta el script /opt/scripts/backup_notes.sh con sus privilegios cada minuto. Al tener permisos de escritura en el script (777), se inyecta una reverse shell que se conecta al puerto 9001 de la máquina atacante, obteniendo así una shell interactiva con los permisos de clara_immerwahr cuando el cron ejecute el script modificado.
+Ya que tenemos la pista de ver /etc/crontab, tenemos que lograr la obtención de acceso al usuario clara_immerwahr explotando la tarea cron que ejecuta el script /opt/scripts/backup_notes.sh con sus privilegios cada minuto. Al tener permisos de escritura en el script (777), se inyecta una reverse shell que se conecta al puerto 9001 de la máquina atacante, obteniendo así una shell interactiva con los permisos de clara_immerwahr cuando el cron ejecute el script modificado.
 
 Tras obtener acceso como haber_fritz, enumeramos las tareas cron del sistema revisando el archivo /etc/crontab.
 ```bash
