@@ -460,8 +460,53 @@ clara_immerwahr@ammonia:~$
 
 ### FLAG #2: Clara Immerwahr
 
+Encontramos diferentes archivos con información valiosa.
+```bash
+clara_immerwahr@ammonia:~/documents$ ls -la
+total 28
+drwxr-xr-x 3 clara_immerwahr clara_immerwahr 4096 Jul 16 11:16 .
+drwxr-x--- 5 clara_immerwahr clara_immerwahr 4096 Jul 16 10:46 ..
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr  409 Jul 15 10:49 analysis_report.txt
+-rw-rw-r-- 1 clara_immerwahr clara_immerwahr  155 Jul 16 11:16 .answer
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr  386 Jul 16 11:15 biografia.txt
+drwx------ 2 clara_immerwahr clara_immerwahr 4096 Jul 16 11:15 conflicto_etico
+-rw-r--r-- 1 clara_immerwahr clara_immerwahr  750 Jul 16 10:21 personal_diary.txt
+```
 
+```bash
+clara_immerwahr@ammonia:~/documents$ cat biografia.txt
+CLARA IMMERWAHR (1870-1915)
 
+Nacida el 21 de junio de 1870 en Polkendorf, Silesia.
+Primera mujer en obtener un doctorado en química en la Universidad de Breslavia (1900).
+
+Casada con Fritz Haber en 1901.
+Madre de Hermann Haber (1902).
+
+Su vida estuvo marcada por la lucha por la igualdad de género en la ciencia
+y el conflicto ético entre el avance científico y su uso destructivo.
+```
+
+```bash
+clara_immerwahr@ammonia:~/documents$ cat .answer
+No uses decimal.
+Todo experimento comienza en base dos.
+
+#tachado ⊕ #tachado = ?
+
+El resultado no es un número.
+Es la llave que abre el archivo oculto.
+clara_immerw
+```
+Sacamos los números tachados desde la página web de Clara y tulizamos la operación XOR
+
+![](Evidencias_Visuales/tachada1)
+![](Evidencias_Visuales/tachada2)
+
+```bash
+clara_immerwahr@ammonia:~/documents$ python3 -c "print(1870 ^ 1900)" 
+34
+```
 ---
 ---
 
