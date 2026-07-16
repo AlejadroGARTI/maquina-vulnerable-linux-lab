@@ -571,9 +571,11 @@ Y encontramos que tenemos que inspeccionar su historia, por lo que nos devolvemo
 
 Encontramos la función que nos permite descifrar la flag, solo reemplazamos los valores obtenidos anteriormente.
 
- ```bash
+```bash
 python3 -c "cifrado='DNCEYGN}AMLMAKOKGLVM}AKGLVKDKAM}FG@G}RPGQGPTCP}NC}TKFC}[}LM}FGQVPWKPNC_'; clave=34; print(''.join(chr(ord(c)^clave) for c in cifrado))"
 ```
+
+De esta forma obtenemos la segunda flag: `flag{el_conocimiento_cientifico_debe_preservar_la_vida_y_no_destruirla}`
 
 ---
 ---
