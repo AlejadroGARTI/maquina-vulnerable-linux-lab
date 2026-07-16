@@ -130,6 +130,29 @@ sudo chown -R www-data:www-data /var/www/html/wp-content/plugins/mail-masta
 ```
 ![](Evidencias_Visuales/mailmasta)
 
+## Creación de flag, directorios y archivos para despistar al atacante.
+
+```bash
+haber_fritz@ammonia:~$ zip -e proceso_haber_bosch.zip proceso_haber_bosch.txt proceso_hab
+er.txt agricultura_1918.txt guerra_quimica.txt amoniaco_sintesis.txt nobel_1918.txt
+Enter password:
+Verify password:
+        zip warning: name not matched: proceso_hab
+  adding: proceso_haber_bosch.txt (deflated 11%)
+er.txt: command not found
+haber_fritz@ammonia:~$ zip -e proceso_haber_bosch.zip "proceso_haber_bosch.txt" "proceso_haber.txt" "agricultura_1918.txt" "guerra_quimica.txt" "amoniaco_sintesis.txt" "nobel_1918.txt"
+Enter password:
+Verify password:
+updating: proceso_haber_bosch.txt (deflated 11%)
+  adding: proceso_haber.txt (stored 0%)
+  adding: agricultura_1918.txt (stored 0%)
+  adding: guerra_quimica.txt (stored 0%)
+  adding: amoniaco_sintesis.txt (stored 0%)
+  adding: nobel_1918.txt (stored 0%)
+haber_fritz@ammonia:~$ echo "Lista de compras" > lista_compras.txt
+etc.....
+
+```
 ---
 ---
 
