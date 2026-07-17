@@ -1,8 +1,6 @@
 # Desarrollo
 
-## 1. Descripción general del sistema
-
-### Descripción Técnica del Sistema (Máquina: Ammonia)
+## 1. Descripción general del sistema (Máquina: Ammonia)
 
 #### Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server (Version 22.04)
 #### Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica.
