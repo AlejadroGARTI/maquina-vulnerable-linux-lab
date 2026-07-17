@@ -29,10 +29,6 @@
 ```
 # Análisis de Riesgos y Vulnerabilidades del Sistema
 
-# Análisis de Riesgos y Vulnerabilidades del Sistema
-
-# Análisis de Riesgos y Vulnerabilidades del Sistema
-
 | **Identificador** | **Activo** | **Tipo** | **Función** | **Riesgo o Vulnerabilidad** |
 |-------------------|------------|----------|-------------|------------------------------|
 | **(WB-1)** | Blog (WordPress) | Aplicación / Web | Publicar el contenido web y actuar como interfaz principal del reto. | Información sensible expuesta (Inclusión de archivos locales o LFI mediante plugins vulnerables que comprometen el código). |
