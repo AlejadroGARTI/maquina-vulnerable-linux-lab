@@ -86,7 +86,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 ## 7. Vulnerabilidades implementadas
 
-### 7.1. Vulnerabilidad de Acceso Inicial: Plugin Vulnerable (Mail Masta - LFI)
+### 7.1. Vulnerabilidad de Acceso Inicial: Plugin Vulnerable (Mail Masta - LFI) (CVE-2016-10956)
 
 - Activo afectado: ((WB-1)) Blog (WordPress) / ((MD-2)) lighttpd (Puerto 7664).
 
