@@ -4,8 +4,8 @@
 
 ### Descripción Técnica del Sistema (Máquina: Ammonia)
 
-##### Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server 
-##### Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica de la organización.
+##### Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server (Version 22.04)
+##### Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica.
 ##### Servicios principales instalados:
 - Servidor web lighttpd ((MD-2)) en el puerto 7664 corriendo una instancia de WordPress ((WB-1)).
 - Servidor de acceso remoto OpenSSH ((MD-1)) en el puerto estándar 22.
