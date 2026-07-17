@@ -8,8 +8,8 @@
 - Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica de la organización.
 
 - Servicios principales instalados:
-- - Servidor web lighttpd ((MD-2)) en el puerto 7664 corriendo una instancia de WordPress ((WB-1)).
-- - Servidor de acceso remoto OpenSSH ((MD-1)) en el puerto estándar 22.
+  -- Servidor web lighttpd ((MD-2)) en el puerto 7664 corriendo una instancia de WordPress ((WB-1)).
+  -- Servidor de acceso remoto OpenSSH ((MD-1)) en el puerto estándar 22.
 
 Usuarios relevantes:
 
