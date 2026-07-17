@@ -2,6 +2,35 @@
 
 ## 1. Descripción general del sistema
 
+### Descripción Técnica del Sistema (Máquina: Ammonia)
+
+- Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server 
+- Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica de la organización.
+
+- Servicios principales instalados:
+- - Servidor web lighttpd ((MD-2)) en el puerto 7664 corriendo una instancia de WordPress ((WB-1)).
+- - Servidor de acceso remoto OpenSSH ((MD-1)) en el puerto estándar 22.
+
+Usuarios relevantes:
+
+haber_fritz: Cuenta local con bajos privilegios encargada de la gestión del entorno inicial.
+
+clara_immerwahr: Cuenta local intermedia responsable de las tareas de automatización y almacenamiento de documentos científicos.
+
+root: Superusuario y administrador absoluto del sistema.
+
+Vulnerabilidades creadas (Cadena de explotación):
+
+Inclusión de Archivos Locales (LFI): Presencia del plugin vulnerable Mail Masta en la aplicación web, lo que permite la lectura de archivos sensibles como wp-config.php y la fuga de credenciales de la base de datos.
+
+Reutilización de Credenciales: La clave hallada en la configuración web es válida para el acceso SSH del usuario haber_fritz.
+
+Permisos de Escritura Globales (777) en Tarea Cron: El script /opt/scripts/backup_notes.sh ((SC-1)) es ejecutado automáticamente por el usuario clara_immerwahr en intervalos de un minuto, pero permite su modificación por cualquier usuario del sistema.
+
+Configuración Laxa de Sudoers: El usuario clara_immerwahr dispone de permisos de ejecución para el binario /usr/bin/awk bajo privilegios de root sin requerir contraseña (NOPASSWD).
+
+Objetivo de la auditoría: El auditor deberá identificar la vulnerabilidad LFI para extraer las credenciales, consolidar acceso inicial por SSH como haber_fritz, secuestrar la tarea programada modificando el script de mantenimiento para pivotar al usuario clara_immerwahr y, finalmente, abusar de la directiva de sudo mediante la técnica de escape del binario awk (GTFOBins) para comprometer totalmente el sistema obteniendo una shell como root.
+
 ## 2. Esquema de activos y recorrido de explotación
 
 ### 2.1. Esquema de activos
