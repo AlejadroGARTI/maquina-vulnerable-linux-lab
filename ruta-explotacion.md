@@ -163,8 +163,8 @@ Interesting Finding(s):
 [+] Elapsed time: 00:02:55
 ```
 
-## Explotación de LFI en Mail Masta y Enumeración de Configuración
-
+## Explotación de LFI en Mail Masta y enumeración de donfiguración (CVE-2016-10956)
+ 
 Explotación de la vulnerabilidad CVE-2016-10956 en el plugin Mail Masta mediante un Local File Inclusion (LFI) en el archivo /inc/campaign/count_of_send.php con el parámetro pl. 
 
 ### Enumeración de Usuarios del Sistema
