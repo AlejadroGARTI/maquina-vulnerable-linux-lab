@@ -29,13 +29,19 @@
 ```
 # Análisis de Riesgos y Vulnerabilidades del Sistema
 
-| **Activo** | **Tipo** | **Función** | **Riesgo o Vulnerabilidad** |
-|------------|----------|-------------|------------------------------|
-| **Apache** | Servicio | Publicar la aplicación web (WordPress). | Información sensible expuesta (LFI a través del plugin Mail Masta que permite leer archivos como `wp-config.php`). |
-| **SSH** | Servicio | Permitir el acceso remoto para la administración del servidor. | Credenciales débiles o reutilizadas (Uso de la clave de la base de datos de WordPress para loguearse como el usuario `haber_fritz`). |
-| **Usuario local (clara_immerwahr)** | Cuenta | Acceso al sistema y gestión de notas/documentos del laboratorio. | Permisos incorrectos en la configuración de sudoers (Permite ejecutar `/usr/bin/awk` con privilegios de root sin contraseña). |
-| **Script de mantenimiento (backup_notes.sh)** | Archivo | Automatizar la tarea de copia de seguridad de los documentos de Clara. | Permisos globales laxos (777). Puede ser modificado por un usuario no autorizado (`haber_fritz`) para secuestrar el flujo de ejecución (Cron). |
-| **Registros** | Información | Registrar accesos, acciones del sistema y errores de los servicios. | Modificación o acceso no autorizado a datos del sistema si los permisos de lectura de logs revelaran más de la cuenta. |
+# Análisis de Riesgos y Vulnerabilidades del Sistema
+
+# Análisis de Riesgos y Vulnerabilidades del Sistema
+
+| **Identificador** | **Activo** | **Tipo** | **Función** | **Riesgo o Vulnerabilidad** |
+|-------------------|------------|----------|-------------|------------------------------|
+| **(WB-1)** | Blog (WordPress) | Aplicación / Web | Publicar el contenido web y actuar como interfaz principal del reto. | Información sensible expuesta (Inclusión de archivos locales o LFI mediante plugins vulnerables que comprometen el código). |
+| **(MD-2)** | lighttpd | Middleware | Procesar las peticiones HTTP destinadas al blog en el puerto 7664. | Exposición de cabeceras o logs que agraven la fuga de datos si el servicio lee configuraciones de forma insegura. |
+| **(MD-1)** | OpenSSH | Middleware | Gestionar las conexiones de consola remota segura en el puerto 22. | Abuso de canales de administración mediante credenciales obtenidas de forma ilícita (reutilización de claves). |
+| **(COM-1)** | SSH | Comunicación | Canal de transporte para sesiones interactivas y comandos remotos. | Establecimiento de conexiones no autorizadas (shells reversas o directas) si el tráfico saliente/entrante no está filtrado. |
+| **(COM-2)** | HTTP | Comunicación | Canal de transporte de hipertexto para la navegación web del usuario. | Intercepción o manipulación de peticiones si el canal viaja sin cifrar y se realizan ataques en la red local. |
+| **(SO-1)** | Ubuntu Server | Servidor / S.O. | Alojar el núcleo del sistema, gestionar procesos y orquestar el hardware virtual. | Escalada de privilegios a nivel de kernel o explotación de malas configuraciones en la directiva global de sudoers. |
+| **(AC-1)** | Usuarios y Archivos | Control de Acceso / Datos | Regular las identidades locales (haber_fritz, clara) y proteger los scripts/backups de mantenimiento. | Permisos laxos e incorrectos en el sistema de archivos (777 en scripts de Cron), permitiendo la inyección de código a usuarios no autorizados. |
 
 ### 2.2. Recorrido de explotación
 
