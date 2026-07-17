@@ -15,15 +15,10 @@
 ## 7. Vulnerabilidades implementadas
 
 ## 8. Write-up de resolución
-
+- [Write-up de resolución](ruta-explotacion.md)
+  
 ## 9. Credenciales white box
+- [Credenciales white box](credenciales-white-box.md)
 
-### Usuario #1
-- Usuario: haber_fritz
-- Contraseña: 9/12/!1868_Br3sl$a5ia!
-
-### Usuario #2
-- Usuario: clara_immerwahr
-- Contraseña: pacifista1915chemsitry!
 
 
