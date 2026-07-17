@@ -726,6 +726,8 @@ Combinamos las dos mitades: H4b3rB0sch+3H2!NH3
 
 Seguimos las intrucciones y realizamos la rotación. 
 
+![](Evidencias_Visuales/rotacion1)
+
 ![](Evidencias_Visuales/rotacion)
 
 Descomprimimos el archivo y obtenemos la última flag: 
