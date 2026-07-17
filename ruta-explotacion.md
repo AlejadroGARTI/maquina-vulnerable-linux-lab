@@ -724,7 +724,7 @@ H4b3rB0sch+3H2!
 
 Combinamos las dos mitades: H4b3rB0sch+3H2!NH3
 
-Seguimos las intrucciones y realizamos la rotación. 
+Seguimos las intrucciones y realizamos la rotación usando CyberChef. 
 
 ![](Evidencias_Visuales/rotacion1)
 
