@@ -5,3 +5,7 @@
 ### Usuario #2
 - Usuario: clara_immerwahr
 - Contraseña: pacifista1915chemsitry!
+
+### Usuario #3
+- Usuario: root
+- Contraseña: cienciaquimicaammonia!
