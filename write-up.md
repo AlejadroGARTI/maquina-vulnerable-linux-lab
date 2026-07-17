@@ -128,6 +128,12 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Cómo se corregiría en un sistema real: Revocar la directiva NOPASSWD para comandos que dispongan de funciones de escape integradas. Si es estrictamente necesario delegar la tarea a awk, estructurar scripts específicos firmados o restringir sus argumentos mediante alias de comandos específicos en /etc/sudoers para evitar la inyección de la función system().
 
+### 7.4. Flags
+
+- usuario #1 (haber_fritz) : aber_fritz@ammonia:~/.secret/backup$ 'Proceso Haber-Bosch para la producción de amoníaco.zip'
+- usuario #2 (clara_immerwahr) : /documents/conflicto_etico$ cat .clara_ultimas_palabras
+- usuario #3 (root.txt) : root@ammonia:/# unzip -p sintesis_catalitica_amonio.zip
+  
 ## 8. Write-up de resolución
 - [Write-up de resolución](ruta-explotacion.md)
   
