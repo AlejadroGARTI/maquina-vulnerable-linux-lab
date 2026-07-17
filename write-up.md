@@ -87,7 +87,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 ## 7. Vulnerabilidades implementadas
 
 ### 7.1. Vulnerabilidad de Acceso Inicial: Plugin Vulnerable (Mail Masta - LFI)
-Justificación
+
 - Activo afectado: ((WB-1)) Blog (WordPress) / ((MD-2)) lighttpd (Puerto 7664).
 
 - Configuración la provoca: La instalación y activación del plugin desactualizado Mail Masta (versión 1.0), el cual carece de sanitización en sus parámetros de entrada (específicamente en variables de inclusión de archivos).
@@ -101,7 +101,7 @@ Justificación
 - Cómo se corregiría en un sistema real: Desinstalar de inmediato el plugin Mail Masta o actualizarlo a una versión parcheada que sanitice las entradas del usuario. Implementar directivas estrictas en la configuración de PHP (allow_url_fopen = Off y allow_url_include = Off).
 
 ### 7.2. Escalada de Privilegios (Movimiento Lateral): Tarea Cron Modificable
-Justificación
+
 - Activo afectado: ((AC-1)) Usuarios y Archivos / Script de mantenimiento /opt/scripts/backup_notes.sh.
 
 - Configuración la provoca: Una asignación laxa e incorrecta de privilegios en el sistema de archivos (chmod 777) sobre el script de copia de seguridad, sumado a una tarea programada en el archivo general /etc/crontab que ejecuta dicho script cada minuto bajo el contexto del usuario clara_immerwahr.
@@ -115,7 +115,7 @@ Justificación
 - Cómo se corregiría en un sistema real: Aplicar el principio de mínimo privilegio sobre el archivo de mantenimiento, eliminando el permiso de escritura para el resto de usuarios del sistema mediante el comando chmod 755 /opt/scripts/backup_notes.sh o asignando la propiedad estricta a su ejecutor legítimo.
 
 ### 7.3. Escalada de Privilegios (Máxima): Configuración Insegura de Sudo (awk)
-Justificación
+
 - Activo afectado: ((SO-1)) Ubuntu Server / Reglas de Sudoers.
 
 - Configuración la provoca: La inclusión de una regla permisiva en el archivo de configuración /etc/sudoers que autoriza explícitamente a la cuenta clara_immerwahr a ejecutar el binario del sistema /usr/bin/awk con privilegios de administrador sin requerir autenticación (NOPASSWD:).
