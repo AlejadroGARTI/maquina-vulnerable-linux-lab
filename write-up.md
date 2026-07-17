@@ -4,18 +4,18 @@
 
 ### Descripción Técnica del Sistema (Máquina: Ammonia)
 
-##### Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server (Version 22.04)
-##### Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica.
-##### Servicios principales instalados:
+#### Tipo de sistema: Servidor interno basado en el sistema operativo Ubuntu Server (Version 22.04)
+#### Finalidad: Alojar la aplicación web corporativa / blog de divulgación científica.
+#### Servicios principales instalados:
 - Servidor web lighttpd ((MD-2)) en el puerto 7664 corriendo una instancia de WordPress ((WB-1)).
 - Servidor de acceso remoto OpenSSH ((MD-1)) en el puerto estándar 22.
 
-##### Usuarios relevantes:
+#### Usuarios relevantes:
 - haber_fritz: Cuenta local con bajos privilegios encargada de la gestión del entorno inicial.
 - clara_immerwahr: Cuenta local intermedia responsable de las tareas de automatización y almacenamiento de documentos científicos.
 - root: Superusuario y administrador absoluto del sistema.
 
-##### Vulnerabilidades creadas (Cadena de explotación):
+#### Vulnerabilidades creadas (Cadena de explotación):
 
 - Inclusión de Archivos Locales (LFI): Presencia del plugin vulnerable Mail Masta en la aplicación web, lo que permite la lectura de archivos sensibles como wp-config.php y la fuga de credenciales de la base de datos.
 
@@ -25,7 +25,7 @@
 
 - Configuración Laxa de Sudoers: El usuario clara_immerwahr dispone de permisos de ejecución para el binario /usr/bin/awk bajo privilegios de root sin requerir contraseña (NOPASSWD).
 
-##### Objetivo de la auditoría: 
+#### Objetivo de la auditoría: 
 El auditor deberá identificar la vulnerabilidad LFI para extraer las credenciales, consolidar acceso inicial por SSH como haber_fritz, secuestrar la tarea programada modificando el script de mantenimiento para pivotar al usuario clara_immerwahr y, finalmente, abusar de la directiva de sudo mediante la técnica de escape del binario awk (GTFOBins) para comprometer totalmente el sistema obteniendo una shell como root.
 
 ## 2. Esquema de activos y recorrido de explotación
