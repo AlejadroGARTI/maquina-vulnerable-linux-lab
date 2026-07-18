@@ -403,6 +403,36 @@ Protección anti-modificaciones: Los logs almacenados en /opt/scripts/ deben pro
 
 ## 5. Administración de usuarios, permisos y accesos
 
+### 5.1. Identificación de usuarios y grupos
+
+```bash
+root@ammonia:/home/haber_fritz# id haber_fritz
+uid=1000(haber_fritz) gid=1000(haber_fritz) groups=1000(haber_fritz),4(adm),24(cdrom),30(dip),46(plugdev),110(lxd)
+root@ammonia:/home/haber_fritz# id clara_immerwahr
+uid=1001(clara_immerwahr) gid=1001(clara_immerwahr) groups=1001(clara_immerwahr)
+root@ammonia:/home/haber_fritz# grep -E '/bin/bash|/bin/sh' /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+haber_fritz:x:1000:1000:Fritz Haber:/home/haber_fritz:/bin/bash
+clara_immerwahr:x:1001:1001:Clara Immerwahr,,,:/home/clara_immerwahr:/bin/bash
+root@ammonia:/home/haber_fritz# id www-data
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+root@ammonia:/home/haber_fritz#
+```
+| Usuario | Tipo de cuenta | Grupo primario | Función en el escenario | Acceso permitido / Shell |
+|---------|---------------|----------------|-------------------------|--------------------------|
+| root | Superusuario | root (0) | Administrador supremo del sistema operativo. Objetivo final del reto. | Sí (`/bin/bash`). Bloqueado en SSH perimetral. |
+| haber_fritz | Usuario | haber_fritz (1000) | Auditor/Punto de persistencia local. Almacena flags e información intermedia. | Sí (`/bin/bash`). Sin privilegios de sudo. |
+| clara_immerwahr | Usuario | clara_immerwahr (1001) | Administradora interna con permisos específicos de explotación (awk). | Sí (`/bin/bash`). Origen del script de respaldo. |
+| www-data | Servicio | www-data (33) | Ejecución del servidor web perimetral (lighttpd) y WordPress. | No (`/usr/sbin/nologin`). Directorio `/var/www/html`. |
+
+### 5.2. Creación de usuarios y grupos
+### 5.3. Configuración de propietarios y permisos
+### 5.4. Verificación del acceso
+### 5.5. Acceso local y remoto
+### 5.6. Privilegios administrativos
+### 5.7. Relación con la vulnerabilidad
+### 5.8. Comprobación final
+
 ---
 ---
 
