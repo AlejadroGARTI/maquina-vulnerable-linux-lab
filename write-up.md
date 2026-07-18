@@ -26,6 +26,9 @@
 #### Objetivo de la auditoría: 
 El auditor deberá identificar la vulnerabilidad LFI para extraer las credenciales, consolidar acceso inicial por SSH como haber_fritz, secuestrar la tarea programada modificando el script de mantenimiento para pivotar al usuario clara_immerwahr y, finalmente, abusar de la directiva de sudo mediante la técnica de escape del binario awk (GTFOBins) para comprometer totalmente el sistema obteniendo una shell como root.
 
+---
+---
+
 ## 2. Esquema de activos y recorrido de explotación
 
 ### 2.1. Esquema de activos
@@ -75,6 +78,8 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
        ▼ (Escalada de Privilegios: GTFOBins vía sudo o SUID)
 [ ROOT ]
 ```
+---
+---
 
 ## 3. Administración de procesos y rendimiento
 
@@ -217,11 +222,34 @@ haber_fritz@ammonia:~$ kill 13376
 
 - Finalización del proceso: Una vez validadas las directivas de control, el proceso se concluyó de forma limpia enviando la señal estándar SIGTERM (15) mediante el comando kill 13376, liberando inmediatamente el identificador de la tabla del sistema operativo.
 
+### 3.4. Comprobación final
+
+| Parámetro | Comando o evidencia | Resultado | Cumple | Acción correctiva |
+|-----------|---------------------|-----------|--------|-------------------|
+| Uso de CPU | `top` | 0.0% us / 100.0% id (Carga nula en el procesador, Load Avg: 0.00). | Sí | Ninguna. La CPU cuenta con disponibilidad absoluta para responder a los scripts de explotación. |
+| Uso de memoria | `free -h` | 19.6% en uso (379 MiB utilizados de un total de 1.9 GiB disponibles). | Sí | Ninguna. Existen 1.3 GiB de memoria disponible garantizada. |
+| Servicio seleccionado | `systemctl status` | State: running (0 trabajos en cola, 0 unidades caídas). Estructura limpia en system.slice. | Sí | Ninguna. El estado global del sistema operativo es completamente saludable. |
+| Prioridad modificada | `renice` / `ps` | Valor actualizado. Degradación de prioridad exitosa a factor Nice 10 (STAT: SN). | Sí | Ninguna. |
+
+---
+---
+
 ## 4. Administración del almacenamiento
+
+### 4.1. Identificación del almacenamiento
+
+---
+---
 
 ## 5. Administración de usuarios, permisos y accesos
 
+---
+---
+
 ## 6. Evaluación de servicios de comunicaciones
+
+---
+---
 
 ## 7. Vulnerabilidades implementadas
 
@@ -272,10 +300,16 @@ haber_fritz@ammonia:~$ kill 13376
 - usuario #1 (haber_fritz) : aber_fritz@ammonia:~/.secret/backup$ 'Proceso Haber-Bosch para la producción de amoníaco.zip'
 - usuario #2 (clara_immerwahr) : /documents/conflicto_etico$ cat .clara_ultimas_palabras
 - usuario #3 (root.txt) : root@ammonia:/# unzip -p sintesis_catalitica_amonio.zip
-  
+
+---
+---
+
 ## 8. Write-up de resolución
 - [Write-up de resolución](ruta-explotacion.md)
-  
+
+---
+---
+
 ## 9. Credenciales white box
 - [Credenciales white box](credenciales-white-box.md)
 
