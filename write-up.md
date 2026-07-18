@@ -426,7 +426,36 @@ root@ammonia:/home/haber_fritz#
 | www-data | Servicio | www-data (33) | Ejecución del servidor web perimetral (lighttpd) y WordPress. | No (`/usr/sbin/nologin`). Directorio `/var/www/html`. |
 
 ### 5.2. Creación de usuarios y grupos
+
+```bash
+      [ Nivel Supremo ]             (Acceso Total)
+              |                          ROOT
+              v                           ^
+       [ Nivel Intermedio ]               |  <-- Escalada vía Sudo (awk)
+       (Usuario Autorizado)        CLARA_IMMERWAHR
+              ^                           ^
+              |                           |  <-- Movimiento lateral (Cron)
+       [ Nivel Inicial ]                  |
+     (Usuarios del Reto)           WWW-DATA   [HABER_FRITZ] (Usuario No Autorizado)
+                                      ^              |
+                                      |              v
+                             (Intrusión Web)   (Aislado / Sin Sudo)
+```
+                             
 ### 5.3. Configuración de propietarios y permisos
+
+- Qué usuario es el propietario. El usuario propietario del directorio /opt/scripts/ y de los recursos de automatización internos es root (el superusuario del sistema).
+- Qué grupo tiene acceso. El grupo propietario asignado al recurso es el grupo root. No obstante, al tratarse de un entorno de escalada, el acceso está condicionado globalmente por los permisos del tercer bloque (others).
+- Qué permisos tiene el propietario. El propietario (root) dispone de permisos totales de Lectura, Escritura y Ejecución (rwx / Valor octal 7), lo que le permite modificar la ruta, añadir nuevos scripts o alterar las tareas automatizadas del sistema
+- Qué permisos tiene el grupo. El grupo propietario (root) dispone de permisos de Lectura y Acceso/Ejecución (r-x / Valor octal 5). Los usuarios que pertenezcan a este grupo pueden visualizar el contenido pero no editarlo de forma directa.
+- Qué permisos tienen los demás usuarios. Los demás usuarios tienen permisos de Lectura y Acceso (r-x / Valor octal 5) y sobre el archivo del script interno (Vector del Reto), los demás usuarios poseen permisos deliberados de Lectura, Escritura y Ejecución (rwx / Valor octal 7 o 6). Esto constituye la vulnerabilidad de diseño del laboratorio.
+- Qué usuarios pueden leer, escribir o acceder.
+  - Lectura y Acceso: Todos los usuarios del sistema (root, clara_immerwahr y el usuario de entrada haber_fritz) pueden acceder al directorio, listar su contenido y leer las líneas de código del script. Esto permite al alumno inspeccionar el entorno durante la fase de reconocimiento.
+
+  - Escritura (Modificación): Debido a los permisos laxos aplicados sobre el archivo del script, el usuario de entrada haber_fritz puede escribir y modificar su contenido. Esto le permite inyectar comandos maliciosos (como una reverse shell).
+
+  - Ejecución: El script es ejecutado de forma automática por la tarea programada (cronjob) bajo el contexto de la usuaria intermedia clara_immerwahr. Al procesarse con su identidad, cualquier comando inyectado por haber_fritz se ejecutará con los privilegios de Clara, materializando con éxito el movimiento lateral.
+
 ### 5.4. Verificación del acceso
 ### 5.5. Acceso local y remoto
 ### 5.6. Privilegios administrativos
