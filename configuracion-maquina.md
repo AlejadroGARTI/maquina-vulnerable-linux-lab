@@ -225,6 +225,12 @@ clara_immerwahr ALL=(ALL) NOPASSWD: /usr/bin/awk
 ```
 
 
+gpasswd -d haber_fritz sudo
+
+
+groups haber_fritz
+
+
 
 
 
