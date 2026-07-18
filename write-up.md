@@ -428,21 +428,27 @@ root@ammonia:/home/haber_fritz#
 ### 5.2. Creación de usuarios y grupos
 
 ```bash
-      [ Nivel Supremo ]             (Acceso Total)
+       [ Nivel Supremo ]            (Acceso Total)
               |                          ROOT
               v                           ^
        [ Nivel Intermedio ]               |  <-- Escalada vía Sudo (awk)
-       (Usuario Autorizado)        CLARA_IMMERWAHR
+       (Usuario Autorizado)         CLARA_IMMERWAHR
               ^                           ^
               |                           |  <-- Movimiento lateral (Cron)
        [ Nivel Inicial ]                  |
-     (Usuarios del Reto)           WWW-DATA   [HABER_FRITZ] (Usuario No Autorizado)
-                                      ^              |
-                                      |              v
-                             (Intrusión Web)   (Aislado / Sin Sudo)
+     (Usuarios del Reto)            [HABER_FRITZ] (Usuario No Autorizado)
+                                          |
+                                          v
+                                 (Aislado / Sin Sudo)
 ```
                              
 ### 5.3. Configuración de propietarios y permisos
+
+```bash
+root@ammonia:/home/haber_fritz# ls -ld /var/www/html /opt/scripts
+drwxr-xr-x 2 root     root     4096 Jul 18 18:05 /opt/scripts
+drwxr-xr-x 5 www-data www-data 4096 Jul 15 10:58 /var/www/html
+```
 
 - Qué usuario es el propietario. El usuario propietario del directorio /opt/scripts/ y de los recursos de automatización internos es root (el superusuario del sistema).
 - Qué grupo tiene acceso. El grupo propietario asignado al recurso es el grupo root. No obstante, al tratarse de un entorno de escalada, el acceso está condicionado globalmente por los permisos del tercer bloque (others).
@@ -457,8 +463,151 @@ root@ammonia:/home/haber_fritz#
   - Ejecución: El script es ejecutado de forma automática por la tarea programada (cronjob) bajo el contexto de la usuaria intermedia clara_immerwahr. Al procesarse con su identidad, cualquier comando inyectado por haber_fritz se ejecutará con los privilegios de Clara, materializando con éxito el movimiento lateral.
 
 ### 5.4. Verificación del acceso
+
+#### Usuario autorizado (root)
+
+```bash
+root@ammonia:/home/haber_fritz# gpasswd -d haber_fritz sudo
+Removing user haber_fritz from group sudo
+```
+
+#### Usuarios no autorizados (haber_fritz y clara_immerwahr)
+
+```bash
+haber_fritz@ammonia:~$ sudo su
+[sudo] password for haber_fritz:
+haber_fritz is not in the sudoers file.  This incident will be reported.
+
+clara_immerwahr@ammonia:/home/haber_fritz$ sudo su
+[sudo] password for clara_immerwahr:
+Sorry, user clara_immerwahr is not allowed to execute '/usr/bin/su' as root on ammonia.
+clara_immerwahr@ammonia:/home/haber_fritz$ sudo -l
+Matching Defaults entries for clara_immerwahr on ammonia:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User clara_immerwahr may run the following commands on ammonia:
+    (ALL) NOPASSWD: /usr/bin/awk
+```
+    
 ### 5.5. Acceso local y remoto
+
+- 1. Qué usuario puede conectarse
+El único usuario habilitado para realizar la conexión e intrusión inicial al entorno local del laboratorio es haber_fritz.
+
+  - Nota de seguridad: Los usuarios de servicio (como www-data) carecen de shell interactiva (nologin), y el acceso directo al superusuario (root) a través de la red perimetral se encuentra estrictamente deshabilitado por política de hardening (endurecimiento del servidor).
+
+- 2. Qué mecanismo de autenticación utiliza
+El acceso se realiza de forma remota a través del protocolo SSH (Secure Shell) en el puerto configurado del servidor ammonia. El mecanismo de autenticación empleado depende del despliegue específico del escenario:
+
+  - Autenticación por contraseña tradicional: El alumno debe validar las credenciales preestablecidas de haber_fritz obtenidas en la fase previa.
+
+  - Alternativa de diseño: Si el reto simula un escenario de clave comprometida, se utiliza la autenticación basada en Llaves Asimétricas SSH (Clave Privada id_rsa).
+
+- 3. A qué recursos puede acceder
+Una vez autenticado, el usuario haber_fritz se encuentra en un entorno restringido de usuario raso, pero tiene visibilidad sobre los siguientes recursos:
+
+  - Su directorio personal (/home/haber_fritz), donde aloja flags locales o pistas de la auditoría.
+
+  - Permisos de lectura global (r-x) sobre directorios comunes del sistema, lo que le permite inspeccionar la carpeta de scripts (/opt/scripts/) y descubrir el archivo laxo.
+
+  - Permisos de lectura y ejecución (r-x) sobre los archivos de configuración perimetrales y de WordPress en /var/www/html.
+
+- 4. Qué riesgo supondría permitir accesos innecesarios
+Permitir privilegios excesivos o accesos no controlados en este punto rompería por completo el propósito formativo del reto y degradaría la seguridad del servidor debido a los siguientes riesgos:
+
+  - Destrucción de la cadena de explotación (Atajos/Trampas): Si el usuario haber_fritz hubiese mantenido su pertenencia al grupo sudo, el alumno habría escalado a root de forma inmediata ejecutando un simple sudo su, ignorando por completo la investigación del script de la tarea programada (Cron) y la explotación del binario awk de Clara.
+
+  - Movimientos laterales descontrolados: Si haber_fritz tuviese acceso de escritura en directorios raíz (/etc, /var), un atacante real (o el alumno) podría alterar la persistencia del servidor, cambiar contraseñas de otros usuarios del reto o corromper los servicios web legítimos.
+
+  - Falta de principio de menor privilegio: Mantener accesos innecesarios expande la superficie de ataque lúdica del laboratorio, transformando un reto de ingenio y pivoting técnico en una escalada trivial.
+
+```bash
+root@ammonia:/home/haber_fritz# sudo systemctl status ssh
+● ssh.service - OpenBSD Secure Shell server
+     Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sat 2026-07-18 17:20:57 UTC; 1h 26min ago
+       Docs: man:sshd(8)
+             man:sshd_config(5)
+   Main PID: 917 (sshd)
+      Tasks: 1 (limit: 2172)
+     Memory: 5.5M
+        CPU: 78ms
+     CGroup: /system.slice/ssh.service
+             └─917 "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+
+Jul 18 17:20:56 ammonia systemd[1]: Starting OpenBSD Secure Shell server...
+Jul 18 17:20:57 ammonia sshd[917]: Server listening on 0.0.0.0 port 22.
+Jul 18 17:20:57 ammonia sshd[917]: Server listening on :: port 22.
+Jul 18 17:20:57 ammonia systemd[1]: Started OpenBSD Secure Shell server.
+Jul 18 17:26:11 ammonia sshd[13066]: Accepted password for haber_fritz from 192.168.1.101 port 58559 ssh2
+Jul 18 17:26:11 ammonia sshd[13066]: pam_unix(sshd:session): session opened for user haber_fritz(uid=1000) by (uid=0)
+Jul 18 18:23:27 ammonia sshd[13805]: Accepted password for haber_fritz from 192.168.1.101 port 51300 ssh2
+Jul 18 18:23:27 ammonia sshd[13805]: pam_unix(sshd:session): session opened for user haber_fritz(uid=1000) by (uid=0)
+
+root@ammonia:/home/haber_fritz# ss -tulnp | grep :22
+tcp   LISTEN 0      128                             0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=917,fd=3))      
+tcp   LISTEN 0      128                                [::]:22           [::]:*    users:(("sshd",pid=917,fd=4)) 
+```
+
+```bash
+C:\Users\XPC>ssh haber_fritz@192.168.1.103
+haber_fritz@192.168.1.103's password:
+Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 5.15.0-185-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sat Jul 18 06:23:27 PM UTC 2026
+
+  System load:  0.0                Processes:              220
+  Usage of /:   54.7% of 11.21GB   Users logged in:        1
+  Memory usage: 25%                IPv4 address for ens33: 192.168.1.103
+  Swap usage:   0%
+
+
+Expanded Security Maintenance for Applications is not enabled.
+
+8 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+New release '24.04.4 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+Last login: Sat Jul 18 17:26:11 2026 from 192.168.1.101
+                     (●) (●)
+                      \   /
+                     .-----.
+                    /   N   \
+                    \       /
+                     '-----'
+                     /  |  \
+                    /   |   \
+                   /    |    \
+                .-.     |     .-.
+               ( H )    |    ( H )
+                '-'    .-.    '-'
+                      ( H )
+                       '-'
+haber_fritz@ammonia:~$
+```
+
 ### 5.6. Privilegios administrativos
+
+#### haber_fritz
+
+haber_fritz@ammonia:~$ sudo -l
+[sudo] password for haber_fritz:
+Sorry, user haber_fritz may not run sudo on ammonia.
+
+#### clara_immerwahr
+
+
 ### 5.7. Relación con la vulnerabilidad
 ### 5.8. Comprobación final
 
