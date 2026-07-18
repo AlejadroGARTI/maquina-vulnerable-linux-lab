@@ -160,6 +160,7 @@ Jul 18 17:36:01 ammonia CRON[13217]: pam_unix(cron:session): session opened for 
 Jul 18 17:36:01 ammonia CRON[13218]: (clara_immerwahr) CMD (/opt/scripts/backup_notes.sh)
 Jul 18 17:36:01 ammonia CRON[13217]: pam_unix(cron:session): session closed for user clara_immerwahr
 lines 1-21/21 (END)
+
 haber_fritz@ammonia:~$ sudo systemctl stop cron
 haber_fritz@ammonia:~$ sudo systemctl status cron
 ○ cron.service - Regular background program processing daemon
@@ -181,6 +182,7 @@ Jul 18 17:37:12 ammonia systemd[1]: Stopping Regular background program processi
 Jul 18 17:37:12 ammonia systemd[1]: cron.service: Deactivated successfully.
 Jul 18 17:37:12 ammonia systemd[1]: Stopped Regular background program processing daemon.
 lines 1-18/18 (END)
+
 haber_fritz@ammonia:~$ sudo systemctl start cron
 haber_fritz@ammonia:~$ sudo systemctl status cron
 ● cron.service - Regular background program processing daemon
@@ -237,6 +239,164 @@ haber_fritz@ammonia:~$ kill 13376
 ## 4. Administración del almacenamiento
 
 ### 4.1. Identificación del almacenamiento
+```bash
+haber_fritz@ammonia:~$ lsblk -f
+NAME FSTYPE FSVER LABEL                         UUID                                   FSAVAIL FSUSE% MOUNTPOINTS
+loop0
+     squash 4.0                                                                              0   100% /snap/snapd/27406
+loop1
+     squash 4.0                                                                              0   100% /snap/lxd/40115
+loop2
+     squash 4.0                                                                              0   100% /snap/core22/2411
+loop3
+     squash 4.0                                                                              0   100% /snap/snapd/21759
+loop4
+     squash 4.0                                                                              0   100% /snap/lxd/29351
+loop5
+     squash 4.0                                                                              0   100% /snap/core20/2318
+loop6
+     squash 4.0                                                                              0   100% /snap/core20/2866
+sda
+├─sda1
+│
+├─sda2
+│    ext4   1.0                                 ae1af663-a17d-4b91-a388-7b304626f12b      1.7G     7% /boot
+└─sda3
+     LVM2_m LVM2                                EGLS8q-syYn-zTwu-ec1h-LCE9-1HiJ-lwlwCU
+  └─ubuntu--vg-ubuntu--lv
+     ext4   1.0                                 1d2170cc-1b71-4933-b0ac-6948c3798110      4.5G    54% /
+sr0  iso966 Jolie Ubuntu-Server 22.04.5 LTS amd64
+                                                2024-09-11-18-46-48-00
+haber_fritz@ammonia:~$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              193M  1.3M  192M   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   12G  6.1G  4.6G  58% /
+tmpfs                              964M     0  964M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  133M  1.7G   8% /boot
+tmpfs                              193M  4.0K  193M   1% /run/user/1000
+```
+
+- Dispositivo y Partición: El sistema operativo está instalado en el disco físico sda, utilizando un esquema de volúmenes lógicos (LVM) mapeado en la partición raíz /dev/mapper/ubuntu--vg-ubuntu--lv (derivada de la partición física sda3). El directorio de arranque se aloja de forma aislada en /dev/sda2 (/boot).
+
+- Sistema de Archivos: Tanto el volumen raíz (/) como la partición de arranque (/boot) están estructurados bajo el formato nativo ext4.
+
+- Espacio Ocupado: El volumen principal del sistema operativo tiene 6.1 GiB ocupados (un 58% del total asignado).
+
+- Espacio Disponible: Quedan exactamente 4.6 GiB totalmente libres y accesibles en la raíz del sistema operativo.
+
+- Cumplimiento: Sí, cumple rigurosamente con el plan de explotación. Contar con un 42% de almacenamiento libre asegura holgura absoluta para la generación de logs de auditoría, la descarga de herramientas tácticas y la inyección temporal de archivos durante las fases de compromiso web y escalada de privilegios sin riesgo de saturar el disco.
+
+### 4.2. Organización de la información
+
+```bash
+/
+├── etc/
+│   └── lighttpd/          # Configuración del servidor web perimetral
+├── var/
+│   └── www/
+│       └── html/          # Aplicación web activa (WordPress)
+└── opt/
+    └── scripts/           # Automatizaciones y scripts del reto (Cron)
+```
+- /etc/lighttpd/ (Directorio de Configuración): Almacena las directivas operacionales del servidor web lighttpd.conf. Controla los parámetros del puerto no estándar (7664) y el módulo CGI que procesa las peticiones dinámicas. Es una zona de auditoría estática.
+
+- /var/www/html/ (Capa de Aplicación Web): Espacio bajo la propiedad del usuario www-data. Aloja los ficheros fuentes del CMS WordPress ((WB-1)), la base de datos local y, críticamente, los plugins vulnerables que permiten la Inclusión de Archivos Locales (LFI) y la exfiltración inicial del wp-config.php.
+
+- /opt/scripts/ (Capa de Automatización y Movimiento Lateral): Reservado para software opcional y scripts de terceros. Contiene el binario de mantenimiento /opt/scripts/backup_notes.sh. Al poseer una asignación laxa de privilegios (777), se convierte en el objetivo del vector de secuestro de tareas (hijacking) por parte del auditor bajo el contexto de la tarea automatizada de Clara.
+
+### 4.3. Copia de seguridad
+
+```bash
+haber_fritz@ammonia:~$ sudo tar -czf /opt/scripts/backup-web-ammonia.tar.gz /var/www/html
+[sudo] password for haber_fritz:
+tar: Removing leading `/' from member names
+haber_fritz@ammonia:~$ ls -lh /opt/scripts/backup-web-ammonia.tar.gz
+-rw-r--r-- 1 root root 36M Jul 18 17:59 /opt/scripts/backup-web-ammonia.tar.gz
+```
+- Información copiada: Se ha empaquetado y comprimido la totalidad del directorio /var/www/html, el cual aloja el código fuente del CMS WordPress ((WB-1)), configuraciones internas, bases de datos planas y plugins del escenario.
+
+- Importancia estratégica: Esta zona concentra la superficie de ataque inicial (vector LFI). Disponer de un respaldo es crítico porque las herramientas de automatización o los payloads de explotación mal optimizados pueden corromper el índice de la aplicación web o alterar archivos esenciales, inhabilitando el laboratorio para futuros despliegues o alumnos.
+
+- Almacenamiento del respaldo: El archivo se ha consolidado bajo el nombre backup-web-ammonia.tar.gz dentro del directorio administrativo /opt/scripts/, registrando un peso optimizado de 36 MiB gracias al algoritmo de compresión gzip.
+
+- Procedimiento de recuperación: En caso de fallo crítico o intrusión destructiva, los servicios lógicos se restablecerían en pocos segundos mediante el purgado del directorio comprometido y la descompresión del archivo raíz con el comando: `sudo tar -xzf /opt/scripts/backup-web-ammonia.tar.gz -C /`
+
+### 4.4. Verificación de la integridad
+
+```bash
+root@ammonia:/home/haber_fritz# sha256sum /opt/scripts/backup-web-ammonia.tar.gz > /opt/scripts/backup-web-ammonia.tar.gz.sha256
+root@ammonia:/home/haber_fritz# sha256sum -c /opt/scripts/backup-web-ammonia.tar.gz.sha256
+/opt/scripts/backup-web-ammonia.tar.gz: OK
+```
+
+- ¿Qué representa el hash? Es una firma digital única de longitud fija (256 bits) calculada mediante el algoritmo matemático SHA-256. Funciona como una huella dactilar exacta del archivo empaquetado.
+
+- Detección de modificaciones: Debido al efecto avalancha, si un atacante alterase un solo bit o carácter dentro del archivo backup-web-ammonia.tar.gz, el hash resultante cambiaría por completo, rompiendo la correspondencia con el archivo de verificación original.
+
+- Validación de consistencia: El output OK arrojado por el comando sha256sum -c certifica de manera unívoca que el archivo comprimido actual es idéntico byte por byte al original mapeado en el momento del respaldo, garantizando que está libre de corrupción o inyecciones de código.
+
+### 4.5. Registros del sistema
+
+```bash
+root@ammonia:/home/haber_fritz# tail -n 15 /var/log/auth.log > /opt/scripts/ssh_access.log
+root@ammonia:/home/haber_fritz# cat /opt/scripts/ssh_access.log
+Jul 18 17:59:27 ammonia sudo: pam_unix(sudo:session): session closed for user root
+Jul 18 18:00:01 ammonia CRON[13527]: pam_unix(cron:session): session opened for user clara_immerwahr(uid=1001) by (uid=0)
+Jul 18 18:00:01 ammonia CRON[13527]: pam_unix(cron:session): session closed for user clara_immerwahr
+Jul 18 18:01:01 ammonia CRON[13534]: pam_unix(cron:session): session opened for user clara_immerwahr(uid=1001) by (uid=0)
+Jul 18 18:01:01 ammonia CRON[13534]: pam_unix(cron:session): session closed for user clara_immerwahr
+Jul 18 18:02:01 ammonia CRON[13540]: pam_unix(cron:session): session opened for user clara_immerwahr(uid=1001) by (uid=0)
+Jul 18 18:02:01 ammonia CRON[13540]: pam_unix(cron:session): session closed for user clara_immerwahr
+Jul 18 18:02:44 ammonia sudo: haber_fritz : TTY=pts/0 ; PWD=/home/haber_fritz ; USER=root ; COMMAND=/usr/bin/su
+Jul 18 18:02:44 ammonia sudo: pam_unix(sudo:session): session opened for user root(uid=0) by haber_fritz(uid=1000)
+Jul 18 18:02:44 ammonia su: (to root) root on pts/1
+Jul 18 18:02:44 ammonia su: pam_unix(su:session): session opened for user root(uid=0) by haber_fritz(uid=0)
+Jul 18 18:03:01 ammonia CRON[13560]: pam_unix(cron:session): session opened for user clara_immerwahr(uid=1001) by (uid=0)
+Jul 18 18:03:01 ammonia CRON[13560]: pam_unix(cron:session): session closed for user clara_immerwahr
+Jul 18 18:04:01 ammonia CRON[13566]: pam_unix(cron:session): session opened for user clara_immerwahr(uid=1001) by (uid=0)
+Jul 18 18:04:01 ammonia CRON[13566]: pam_unix(cron:session): session closed for user clara_immerwahr
+root@ammonia:/home/haber_fritz# journalctl -u lighttpd -n 15 > /opt/scripts/lighttpd_access.log
+root@ammonia:/home/haber_fritz# cat /opt/scripts/lighttpd_access.log
+Jul 14 13:30:11 ammonia systemd[1]: Started Lighttpd Daemon.
+Jul 14 13:30:11 ammonia lighttpd[988]: 2026-07-14 13:30:11: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 15 07:37:08 ammonia lighttpd[988]: 2026-07-15 07:37:08: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+-- Boot 156cd879d38e4740a198f9b75cf0fbc3 --
+Jul 15 08:06:55 ammonia systemd[1]: Starting Lighttpd Daemon...
+Jul 15 08:06:56 ammonia lighttpd[856]: 2026-07-15 08:06:55: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 15 08:06:56 ammonia systemd[1]: Started Lighttpd Daemon.
+Jul 15 08:06:56 ammonia lighttpd[963]: 2026-07-15 08:06:56: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 15 09:44:57 ammonia lighttpd[963]: 2026-07-15 09:44:57: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 16 07:29:24 ammonia lighttpd[963]: 2026-07-16 07:29:23: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 16 09:47:52 ammonia lighttpd[963]: 2026-07-16 09:47:52: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 17 07:07:35 ammonia lighttpd[963]: 2026-07-17 07:07:34: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+-- Boot ef8e8e8f0c5e4d58a388b79359811194 --
+Jul 18 17:20:56 ammonia systemd[1]: Starting Lighttpd Daemon...
+Jul 18 17:20:57 ammonia lighttpd[870]: 2026-07-18 17:20:56: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+Jul 18 17:20:57 ammonia systemd[1]: Started Lighttpd Daemon.
+Jul 18 17:20:57 ammonia lighttpd[996]: 2026-07-18 17:20:57: (configfile.c.426) Warning: mod_auth should be listed in server.modules before dynamic backends such as mod_fastcgi
+root@ammonia:/home/haber_fritz#
+```
+Servicio 1 — Subsistema de Autenticación (auth.log): Generado por el demonio de seguridad y PAM (Pluggable Authentication Modules). Contiene registros detallados sobre elevaciones de privilegios (sudo), accesos por SSH e inicios de sesiones automatizadas.
+
+Detección: Permite identificar intentos de fuerza bruta, ejecuciones no autorizadas de sudo por el usuario haber_fritz o, como se evidencia en la captura, el ciclo exacto minuto a minuto de las sesiones del usuario clara_immerwahr instanciadas por el sistema (CRON).
+
+Servicio 2 — Servidor Web HTTP (lighttpd): Controlado por el gestor de servicios systemd y recolectado vía journalctl. Registra eventos del ciclo de vida del servicio web, inicialización de módulos (mod_fastcgi) y advertencias de configuración perimetral.
+
+Detección: Permite aislar caídas provocadas por la inyección de payloads, escaneos de directorios automatizados con herramientas de intrusión o reinicios anómalos del demonio HTTP perimetral.
+
+Protección anti-modificaciones: Los logs almacenados en /opt/scripts/ deben protegerse de forma estricta (restringiendo la escritura mediante permisos rígidos a root) debido a que son la primera línea de defensa forense. Si un atacante logra comprometer la máquina, intentará manipular estos registros para borrar sus huellas (log wiping), ocultar su dirección IP de origen y evadir las alertas del equipo de defensa (Blue Team).
+
+### 4.6. Comprobación final
+
+| Parámetro | Comando o evidencia | Resultado | Cumple | Acción correctiva |
+|-----------|---------------------|-----------|--------|-------------------|
+| Sistema de archivos | `lsblk -f` | ext4 detectado nativamente en el volumen raíz / y en /boot. | Sí | Ninguna. Formato óptimo para la retención de metadatos. |
+| Uso del almacenamiento | `df -h` | 58% ocupado en la partición principal (4.6 GiB totalmente libres). | Sí | Ninguna. Espacio suficiente para albergar logs y payloads. |
+| Estructura creada | `ls -ld /opt/scripts /var/www/html` | Correcta. Estructura FHS de producción operativa y verificada. | Sí | Ninguna. Rutas reales listas para la simulación del reto. |
+| Copia de seguridad | Archivo .tar.gz | Creado en /opt/scripts/backup-web-ammonia.tar.gz (36M). | Sí | Ninguna. Respaldado con éxito el entorno web de WordPress. |
+| Integridad | `sha256sum -c` | /opt/scripts/backup-web-ammonia.tar.gz: OK | Sí | Ninguna. Se garantiza la inmutabilidad de la copia. |
+| Registros | Logs seleccionados | Localizados y volcados (ssh_access.log y lighttpd_access.log). | Sí | Ninguna. |
 
 ---
 ---
