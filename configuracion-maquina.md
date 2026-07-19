@@ -224,12 +224,10 @@ sudo visudo
 clara_immerwahr ALL=(ALL) NOPASSWD: /usr/bin/awk
 ```
 
-
+## Eliminación de privilegios de haber_fritz
+```bash
 gpasswd -d haber_fritz sudo
-
-
-groups haber_fritz
-
+```
 
 
 
