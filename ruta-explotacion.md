@@ -7,17 +7,47 @@ Escaneo completo de todos los puertos con detección de versiones, sistema opera
 ```bash
 sudo nmap -p- -sV -O -sC -v IP
 
-──(kali㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sudo nmap -p- -sV -O -sC -v 192.168.184.140
-Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-15 10:08 +0200
+[sudo] password for kali: 
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-07-20 12:46 +0200
+NSE: Loaded 158 scripts for scanning.
+NSE: Script Pre-scanning.
+Initiating NSE at 12:46
+Completed NSE at 12:46, 0.00s elapsed
+Initiating NSE at 12:46
+Completed NSE at 12:46, 0.00s elapsed
+Initiating NSE at 12:46
+Completed NSE at 12:46, 0.00s elapsed
+Initiating ARP Ping Scan at 12:46
+Scanning 192.168.184.140 [1 port]
+Completed ARP Ping Scan at 12:46, 0.05s elapsed (1 total hosts)
+Initiating Parallel DNS resolution of 1 host. at 12:46
+Completed Parallel DNS resolution of 1 host. at 12:46, 0.50s elapsed
+Initiating SYN Stealth Scan at 12:46
 Scanning 192.168.184.140 [65535 ports]
 Discovered open port 22/tcp on 192.168.184.140
+SYN Stealth Scan Timing: About 19.97% done; ETC: 12:49 (0:02:04 remaining)
 Discovered open port 7664/tcp on 192.168.184.140
-Completed SYN Stealth Scan at 10:08, 6.32s elapsed (65535 total ports)
-Initiating Service scan at 10:08
+SYN Stealth Scan Timing: About 48.30% done; ETC: 12:48 (0:01:05 remaining)
+Completed SYN Stealth Scan at 12:48, 104.42s elapsed (65535 total ports)
+Initiating Service scan at 12:48
 Scanning 2 services on 192.168.184.140
-Host is up (0.0018s latency).
-Not shown: 65533 closed tcp ports (reset)
+Warning: PCRE2 error -47 when probing for service http with the regex '^HTTP/1\.[01] \d\d\d.*\r\nDate: .*\r\nServer: Apache-AdvancedExtranetServer\r\n'
+Warning: PCRE2 error -47 when probing for service http with the regex '^HTTP/1\.0 \d\d\d .*\nDate: .*\nMIME-version: [\d.]+\nServer: Micro-HTTP/([\d.]+)\nContent-type: text/html\n.*Copyright Tektronix, Inc\.'
+Completed Service scan at 12:48, 6.31s elapsed (2 services on 1 host)
+Initiating OS detection (try #1) against 192.168.184.140
+Retrying OS detection (try #2) against 192.168.184.140
+NSE: Script scanning 192.168.184.140.
+Initiating NSE at 12:48
+Completed NSE at 12:48, 5.04s elapsed
+Initiating NSE at 12:48
+Completed NSE at 12:48, 0.06s elapsed
+Initiating NSE at 12:48
+Completed NSE at 12:48, 0.00s elapsed
+Nmap scan report for 192.168.184.140
+Host is up (0.0011s latency).
+Not shown: 65533 filtered tcp ports (no-response)
 PORT     STATE SERVICE VERSION
 22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.16 (Ubuntu Linux; protocol 2.0)
 | ssh-hostkey: 
@@ -26,17 +56,19 @@ PORT     STATE SERVICE VERSION
 7664/tcp open  http    lighttpd 1.4.63
 | http-methods: 
 |_  Supported Methods: GET HEAD POST OPTIONS
-|_http-generator: WordPress 7.0.1
-|_http-server-header: lighttpd/1.4.63
 |_http-title: Fritz Haber &#8211; La Enciclopedia Libre
+|_http-server-header: lighttpd/1.4.63
+|_http-generator: WordPress 7.0.2
 MAC Address: 00:0C:29:54:A8:C3 (VMware)
-Device type: general purpose|router
-Running: Linux 4.X|5.X, MikroTik RouterOS 7.X
-OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3
-OS details: Linux 4.15 - 5.19, OpenWrt 21.02 (Linux 5.4), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3)
-Uptime guess: 21.826 days (since Tue Jun 23 14:19:18 2026)
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|router|storage-misc
+Running (JUST GUESSING): Linux 4.X|5.X|6.X|2.6.X|3.X (97%), MikroTik RouterOS 7.X (95%), Synology DiskStation Manager 5.X (91%)
+OS CPE: cpe:/o:linux:linux_kernel:4 cpe:/o:linux:linux_kernel:5 cpe:/o:linux:linux_kernel:6.0 cpe:/o:mikrotik:routeros:7 cpe:/o:linux:linux_kernel:5.6.3 cpe:/o:linux:linux_kernel:2.6.32 cpe:/o:linux:linux_kernel:3 cpe:/a:synology:diskstation_manager:5.2
+Aggressive OS guesses: Linux 4.15 - 5.19 (97%), Linux 5.0 - 5.14 (97%), OpenWrt 21.02 (Linux 5.4) (97%), Linux 4.19 (95%), Linux 6.0 (95%), MikroTik RouterOS 7.2 - 7.5 (Linux 5.6.3) (95%), Linux 6.15 (92%), Linux 5.4 - 5.10 (91%), Linux 2.6.32 (91%), Linux 2.6.32 - 3.13 (91%)
+No exact OS matches for host (test conditions non-ideal).
+Uptime guess: 14.542 days (since Sun Jul  5 23:47:53 2026)
 Network Distance: 1 hop
-TCP Sequence Prediction: Difficulty=262 (Good luck!)
+TCP Sequence Prediction: Difficulty=261 (Good luck!)
 IP ID Sequence Generation: All zeros
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
