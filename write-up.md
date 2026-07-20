@@ -755,7 +755,7 @@ El hipervisor VMware está configurado en modo Adaptador de puente (Bridged). Es
   - Errores: El contador de errores tanto en recepción (RX) como en transmisión (TX) se mantiene en 0, garantizando que la tarjeta de red virtual y el medio físico no sufren de fallos de colisión o corrupción de tramas.
 
   - Paquetes descartados (Dropped): En el bloque de recepción (RX), se registran 111 paquetes descartados. Este descarte es completamente normal en el modo Bridge, ya que la interfaz recibe tráfico de difusión global de la red física (Broadcast/Multicast de otros equipos de la casa) que el kernel de la máquina virtual decide ignorar de forma segura al no ir dirigidos específicamente a su IP.
-  - 
+
 ### 6.2. Identificación de puertos y servicios
 
 Ver: - [Write-up de resolución](ruta-explotacion.md)
