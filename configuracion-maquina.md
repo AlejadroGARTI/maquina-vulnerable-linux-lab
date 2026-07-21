@@ -245,7 +245,7 @@ To         Action   From
 
 ## Eliminación del historial y archivos temporales
 
-Se ejecutaron los siguientes comandos en cada usuario para borrar cualquier registro de la línea de comandos
+Se ejecutaron los siguientes comandos para borrar cualquier registro de la línea de comandos y sanitizar el laboratorio
 
 ```bash
 apt-get clean && apt-get autoremove -y
