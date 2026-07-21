@@ -76,7 +76,7 @@ El auditor deberá identificar la vulnerabilidad LFI para extraer las credencial
 [ user: clara_immerwahr ] <-- (Su esposa, química brillante y pacifista opositora)
        │
        ▼ (Escalada de Privilegios: GTFOBins vía sudo o SUID)
-[ ROOT ]
+   [ ROOT ]
 ```
 ---
 ---
