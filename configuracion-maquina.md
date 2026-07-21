@@ -243,11 +243,22 @@ To         Action   From
 7664/tcp (v6) ALLOW Anywhere (v6)
 ```
 
-## Eliminación del historial
+## Eliminación del historial y archivos temporales
 
 Se ejecutaron los siguientes comandos en cada usuario para borrar cualquier registro de la línea de comandos
 
 ```bash
+apt-get clean && apt-get autoremove -y
+
+rm -rf /tmp/* /var/tmp/*
+
+find /var/log -type f -exec truncate -s 0 {} \;
+
+cat /dev/null > /root/.bash_history
+cat /dev/null > /home/clara_immerwahr/.bash_history 2>/dev/null
+cat /dev/null > /home/haber_fritz/.bash_history 2>/dev/null
+
+unset HISTFILE
 history -c
-history -w 
+poweroff
 ```
